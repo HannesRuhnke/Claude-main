@@ -1,0 +1,67 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Datenbank (wird als Volume gemountet)
+*.db
+*.db-journal
+
+# Backups (wird als Volume gemountet)
+backups/
+
+# Screenshots (wird als Volume gemountet)
+screenshots/
+
+# Logs
+*.log
+
+# Dokumentation (nicht im Image benötigt)
+*.md
+!README.md
+
+# Config-Dateien (nicht im Image benötigt)
+*.conf
+docker-compose.yml
+unraid-template.xml
+
+# Temporäre Dateien
+*.tmp
+*.temp
+.cache/
+
+# Tests
+tests/
+test_*.py
+*_test.py
+
+# CI/CD
+.github/
+.gitlab-ci.yml

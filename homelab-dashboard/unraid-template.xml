@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>Homelab-Dashboard</Name>
+  <Repository>homelab-dashboard:latest</Repository>
+  <Registry>https://hub.docker.com/</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/YOUR-USERNAME/homelab-dashboard</Support>
+  <Project>https://github.com/YOUR-USERNAME/homelab-dashboard</Project>
+  <Overview>
+    Homelab Dashboard V3 - Enterprise Edition
+
+    Ein professionelles Dashboard zur Verwaltung aller deiner Homelab-Services!
+
+    Features:
+    - Multi-User System mit Rollen &amp; Permissions
+    - Service-Status-Überwachung mit Uptime-History
+    - Analytics &amp; Insights
+    - Backup &amp; Restore
+    - Custom Themes
+    - Passkeys (WebAuthn) Support
+    - Audit-Log
+    - Und vieles mehr!
+
+    Standard-Zugangsdaten:
+    Username: admin
+    Passwort: homelab2025
+
+    WICHTIG: Ändere das Passwort nach dem ersten Login!
+  </Overview>
+  <Category>Tools: Status:Stable</Category>
+  <WebUI>http://[IP]:[PORT:5000]</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/YOUR-USERNAME/homelab-dashboard/main/unraid-template.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/YOUR-USERNAME/homelab-dashboard/main/icon.png</Icon>
+  <ExtraParams>--restart=unless-stopped</ExtraParams>
+  <PostArgs/>
+  <CPUset/>
+  <DateInstalled></DateInstalled>
+  <DonateText/>
+  <DonateLink/>
+  <Requires/>
+  <Config Name="WebUI Port" Target="5000" Default="5000" Mode="tcp" Description="Port für Web-Interface" Type="Port" Display="always" Required="true" Mask="false">5000</Config>
+  <Config Name="Database" Target="/app/homelab.db" Default="/mnt/user/appdata/homelab-dashboard/homelab.db" Mode="rw" Description="Datenbank-Datei (SQLite)" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/homelab-dashboard/homelab.db</Config>
+  <Config Name="Backups" Target="/app/backups" Default="/mnt/user/appdata/homelab-dashboard/backups" Mode="rw" Description="Backup-Verzeichnis" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/homelab-dashboard/backups</Config>
+  <Config Name="Screenshots" Target="/app/screenshots" Default="/mnt/user/appdata/homelab-dashboard/screenshots" Mode="rw" Description="Screenshot-Verzeichnis" Type="Path" Display="always" Required="false" Mask="false">/mnt/user/appdata/homelab-dashboard/screenshots</Config>
+  <Config Name="PUID" Target="PUID" Default="99" Mode="" Description="User ID" Type="Variable" Display="advanced" Required="false" Mask="false">99</Config>
+  <Config Name="PGID" Target="PGID" Default="100" Mode="" Description="Group ID" Type="Variable" Display="advanced" Required="false" Mask="false">100</Config>
+  <Config Name="Flask Environment" Target="FLASK_ENV" Default="production" Mode="" Description="Flask-Umgebung (production/development)" Type="Variable" Display="advanced" Required="false" Mask="false">production</Config>
+  <Config Name="Secret Key" Target="SECRET_KEY" Default="" Mode="" Description="Secret Key für Sessions (optional, wird automatisch generiert)" Type="Variable" Display="advanced" Required="false" Mask="true"></Config>
+</Container>
