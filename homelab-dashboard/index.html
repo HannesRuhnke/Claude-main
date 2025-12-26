@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homelab Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Dark Mode Toggle -->
+    <div class="theme-toggle">
+        <button id="theme-toggle-btn" aria-label="Theme umschalten">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1><i class="fas fa-server"></i> Mein Homelab Dashboard</h1>
+            <p class="subtitle">Zentrale Übersicht aller Services</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Quick Stats -->
+        <section class="quick-stats" id="quick-stats">
+            <div class="stat-card">
+                <i class="fas fa-check-circle"></i>
+                <div class="stat-info">
+                    <h3 id="services-online">0</h3>
+                    <p>Services Online</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-clock"></i>
+                <div class="stat-info">
+                    <h3 id="current-time">--:--</h3>
+                    <p>Aktuelle Zeit</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-heartbeat"></i>
+                <div class="stat-info">
+                    <h3 id="uptime-display">--</h3>
+                    <p>Session Uptime</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Bar -->
+        <section class="search-section">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="Services durchsuchen...">
+            </div>
+        </section>
+
+        <!-- Category Filters -->
+        <section class="filters">
+            <button class="filter-btn active" data-category="all">
+                <i class="fas fa-th"></i> Alle
+            </button>
+            <button class="filter-btn" data-category="media">
+                <i class="fas fa-photo-video"></i> Media
+            </button>
+            <button class="filter-btn" data-category="automation">
+                <i class="fas fa-robot"></i> Automation
+            </button>
+            <button class="filter-btn" data-category="network">
+                <i class="fas fa-network-wired"></i> Netzwerk
+            </button>
+            <button class="filter-btn" data-category="monitoring">
+                <i class="fas fa-chart-line"></i> Monitoring
+            </button>
+            <button class="filter-btn" data-category="storage">
+                <i class="fas fa-hdd"></i> Storage
+            </button>
+            <button class="filter-btn" data-category="other">
+                <i class="fas fa-ellipsis-h"></i> Sonstiges
+            </button>
+        </section>
+
+        <!-- Services Grid -->
+        <section class="services-grid" id="services-grid">
+            <!-- Services werden hier dynamisch geladen -->
+        </section>
+
+        <!-- Add Service Button -->
+        <button class="fab" id="add-service-btn" title="Service hinzufügen">
+            <i class="fas fa-plus"></i>
+        </button>
+    </main>
+
+    <!-- Add Service Modal -->
+    <div class="modal" id="add-service-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus-circle"></i> Neuen Service hinzufügen</h2>
+                <button class="close-btn" id="close-modal-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="add-service-form">
+                    <div class="form-group">
+                        <label for="service-name">Name *</label>
+                        <input type="text" id="service-name" required placeholder="z.B. Plex">
+                    </div>
+                    <div class="form-group">
+                        <label for="service-description">Beschreibung</label>
+                        <input type="text" id="service-description" placeholder="z.B. Media Server">
+                    </div>
+                    <div class="form-group">
+                        <label for="service-url">URL *</label>
+                        <input type="url" id="service-url" required placeholder="http://192.168.1.100:32400">
+                    </div>
+                    <div class="form-group">
+                        <label for="service-icon">Icon (Font Awesome)</label>
+                        <input type="text" id="service-icon" placeholder="fa-play" value="fa-cube">
+                        <small>Siehe <a href="https://fontawesome.com/icons" target="_blank">FontAwesome Icons</a></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="service-category">Kategorie *</label>
+                        <select id="service-category" required>
+                            <option value="media">Media</option>
+                            <option value="automation">Automation</option>
+                            <option value="network">Netzwerk</option>
+                            <option value="monitoring">Monitoring</option>
+                            <option value="storage">Storage</option>
+                            <option value="other">Sonstiges</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="service-color">Farbe</label>
+                        <select id="service-color">
+                            <option value="blue">Blau</option>
+                            <option value="green">Grün</option>
+                            <option value="purple">Lila</option>
+                            <option value="orange">Orange</option>
+                            <option value="red">Rot</option>
+                            <option value="teal">Türkis</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-btn">Abbrechen</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Speichern
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Service Modal -->
+    <div class="modal" id="edit-service-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit"></i> Service bearbeiten</h2>
+                <button class="close-btn" id="close-edit-modal-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-service-form">
+                    <input type="hidden" id="edit-service-id">
+                    <div class="form-group">
+                        <label for="edit-service-name">Name *</label>
+                        <input type="text" id="edit-service-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-service-description">Beschreibung</label>
+                        <input type="text" id="edit-service-description">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-service-url">URL *</label>
+                        <input type="url" id="edit-service-url" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-service-icon">Icon (Font Awesome)</label>
+                        <input type="text" id="edit-service-icon">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-service-category">Kategorie *</label>
+                        <select id="edit-service-category" required>
+                            <option value="media">Media</option>
+                            <option value="automation">Automation</option>
+                            <option value="network">Netzwerk</option>
+                            <option value="monitoring">Monitoring</option>
+                            <option value="storage">Storage</option>
+                            <option value="other">Sonstiges</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-service-color">Farbe</label>
+                        <select id="edit-service-color">
+                            <option value="blue">Blau</option>
+                            <option value="green">Grün</option>
+                            <option value="purple">Lila</option>
+                            <option value="orange">Orange</option>
+                            <option value="red">Rot</option>
+                            <option value="teal">Türkis</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-danger" id="delete-service-btn">
+                            <i class="fas fa-trash"></i> Löschen
+                        </button>
+                        <div class="form-actions-right">
+                            <button type="button" class="btn btn-secondary" id="cancel-edit-btn">Abbrechen</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Speichern
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Homelab Dashboard | <a href="#" id="export-config">Konfiguration exportieren</a> | <a href="#" id="import-config-link">Konfiguration importieren</a></p>
+            <input type="file" id="import-config" accept=".json" style="display: none;">
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

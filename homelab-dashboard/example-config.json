@@ -1,0 +1,114 @@
+{
+  "version": "1.0",
+  "exportDate": "2025-12-26T00:00:00.000Z",
+  "services": [
+    {
+      "id": "example1",
+      "name": "Plex Media Server",
+      "description": "Streaming von Filmen und Serien",
+      "url": "http://192.168.1.100:32400",
+      "icon": "fa-play",
+      "category": "media",
+      "color": "orange"
+    },
+    {
+      "id": "example2",
+      "name": "Nextcloud",
+      "description": "Private Cloud Storage",
+      "url": "http://192.168.1.100:8080",
+      "icon": "fa-cloud",
+      "category": "storage",
+      "color": "blue"
+    },
+    {
+      "id": "example3",
+      "name": "Pi-hole",
+      "description": "Netzwerk-weiter Ad-Blocker",
+      "url": "http://192.168.1.100/admin",
+      "icon": "fa-shield-alt",
+      "category": "network",
+      "color": "red"
+    },
+    {
+      "id": "example4",
+      "name": "Home Assistant",
+      "description": "Smart Home Steuerung",
+      "url": "http://192.168.1.100:8123",
+      "icon": "fa-home",
+      "category": "automation",
+      "color": "purple"
+    },
+    {
+      "id": "example5",
+      "name": "Grafana",
+      "description": "Monitoring Dashboard",
+      "url": "http://192.168.1.100:3000",
+      "icon": "fa-chart-line",
+      "category": "monitoring",
+      "color": "green"
+    },
+    {
+      "id": "example6",
+      "name": "Portainer",
+      "description": "Docker Container Management",
+      "url": "http://192.168.1.100:9000",
+      "icon": "fa-docker",
+      "category": "other",
+      "color": "teal"
+    },
+    {
+      "id": "example7",
+      "name": "Jellyfin",
+      "description": "Open Source Media System",
+      "url": "http://192.168.1.100:8096",
+      "icon": "fa-film",
+      "category": "media",
+      "color": "purple"
+    },
+    {
+      "id": "example8",
+      "name": "Unifi Controller",
+      "description": "Netzwerk Management",
+      "url": "http://192.168.1.100:8443",
+      "icon": "fa-wifi",
+      "category": "network",
+      "color": "blue"
+    },
+    {
+      "id": "example9",
+      "name": "Sonarr",
+      "description": "TV-Serien Verwaltung",
+      "url": "http://192.168.1.100:8989",
+      "icon": "fa-tv",
+      "category": "media",
+      "color": "blue"
+    },
+    {
+      "id": "example10",
+      "name": "Radarr",
+      "description": "Film Verwaltung",
+      "url": "http://192.168.1.100:7878",
+      "icon": "fa-video",
+      "category": "media",
+      "color": "orange"
+    },
+    {
+      "id": "example11",
+      "name": "Prometheus",
+      "description": "Metrics & Monitoring",
+      "url": "http://192.168.1.100:9090",
+      "icon": "fa-database",
+      "category": "monitoring",
+      "color": "red"
+    },
+    {
+      "id": "example12",
+      "name": "Nginx Proxy Manager",
+      "description": "Reverse Proxy Management",
+      "url": "http://192.168.1.100:81",
+      "icon": "fa-server",
+      "category": "network",
+      "color": "green"
+    }
+  ]
+}
