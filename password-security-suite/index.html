@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 Password Security Suite</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🔐 Password Security Suite</h1>
+            <p class="subtitle">Generiere sichere Passwörter & prüfe ihre Stärke</p>
+        </header>
+
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="generator">🎲 Generator</button>
+            <button class="tab-btn" data-tab="checker">📊 Checker</button>
+            <button class="tab-btn" data-tab="passphrase">🔤 Passphrase</button>
+            <button class="tab-btn" data-tab="breach">⚠️ Breach Check</button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+
+            <!-- PASSWORD GENERATOR TAB -->
+            <div class="tab-pane active" id="generator">
+                <div class="card">
+                    <h2>Passwort Generator</h2>
+
+                    <!-- Generated Password Display -->
+                    <div class="password-display">
+                        <input type="text" id="generated-password" readonly value="Klicke auf 'Generieren'">
+                        <button class="btn-icon" id="copy-btn" title="Kopieren">
+                            📋
+                        </button>
+                        <button class="btn-icon" id="refresh-btn" title="Neu generieren">
+                            🔄
+                        </button>
+                    </div>
+
+                    <!-- Settings -->
+                    <div class="settings">
+                        <div class="setting-group">
+                            <label for="password-length">
+                                Länge: <span id="length-value">16</span>
+                            </label>
+                            <input type="range" id="password-length" min="4" max="64" value="16">
+                        </div>
+
+                        <div class="setting-group">
+                            <label>
+                                <input type="checkbox" id="use-uppercase" checked>
+                                Großbuchstaben (A-Z)
+                            </label>
+                        </div>
+
+                        <div class="setting-group">
+                            <label>
+                                <input type="checkbox" id="use-lowercase" checked>
+                                Kleinbuchstaben (a-z)
+                            </label>
+                        </div>
+
+                        <div class="setting-group">
+                            <label>
+                                <input type="checkbox" id="use-digits" checked>
+                                Zahlen (0-9)
+                            </label>
+                        </div>
+
+                        <div class="setting-group">
+                            <label>
+                                <input type="checkbox" id="use-symbols" checked>
+                                Sonderzeichen (!@#$%...)
+                            </label>
+                        </div>
+
+                        <div class="setting-group">
+                            <label>
+                                <input type="checkbox" id="exclude-ambiguous">
+                                Mehrdeutige ausschließen (i, l, 1, L, o, 0, O)
+                            </label>
+                        </div>
+
+                        <div class="setting-group">
+                            <label for="custom-chars">
+                                Eigene Zeichen:
+                            </label>
+                            <input type="text" id="custom-chars" placeholder="z.B. abcd1234!@#$">
+                            <small>Leer lassen für Standard-Zeichensatz</small>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="generate-btn">🎲 Generieren</button>
+
+                    <!-- Strength Indicator -->
+                    <div id="strength-result" class="strength-result" style="display: none;">
+                        <h3>Passwort-Stärke</h3>
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strength-fill"></div>
+                        </div>
+                        <div class="strength-info">
+                            <span id="strength-label">-</span>
+                            <span id="strength-score">0/100</span>
+                        </div>
+                        <div id="strength-details"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASSWORD CHECKER TAB -->
+            <div class="tab-pane" id="checker">
+                <div class="card">
+                    <h2>Passwort-Stärke prüfen</h2>
+
+                    <div class="password-input-group">
+                        <input type="password" id="check-password" placeholder="Passwort eingeben...">
+                        <button class="btn-icon" id="toggle-visibility">👁️</button>
+                    </div>
+
+                    <button class="btn btn-primary" id="check-btn">📊 Stärke prüfen</button>
+
+                    <!-- Results -->
+                    <div id="check-result" class="check-result" style="display: none;">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="check-strength-fill"></div>
+                        </div>
+                        <div class="strength-info">
+                            <span id="check-strength-label">-</span>
+                            <span id="check-strength-score">0/100</span>
+                        </div>
+
+                        <div class="details-grid">
+                            <div class="detail-item">
+                                <span class="detail-label">Länge:</span>
+                                <span id="detail-length">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Entropie:</span>
+                                <span id="detail-entropy">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Crack-Zeit:</span>
+                                <span id="detail-crack-time">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Einzigartige Zeichen:</span>
+                                <span id="detail-unique">-</span>
+                            </div>
+                        </div>
+
+                        <div class="character-checks">
+                            <span class="check-item" id="check-lowercase">
+                                <span class="icon">✗</span> Kleinbuchstaben
+                            </span>
+                            <span class="check-item" id="check-uppercase">
+                                <span class="icon">✗</span> Großbuchstaben
+                            </span>
+                            <span class="check-item" id="check-digits">
+                                <span class="icon">✗</span> Zahlen
+                            </span>
+                            <span class="check-item" id="check-symbols">
+                                <span class="icon">✗</span> Sonderzeichen
+                            </span>
+                        </div>
+
+                        <div id="feedback-list" class="feedback-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASSPHRASE GENERATOR TAB -->
+            <div class="tab-pane" id="passphrase">
+                <div class="card">
+                    <h2>Passphrase Generator</h2>
+                    <p class="info-text">Erstelle leicht merkbare Passphrasen aus zufälligen Wörtern</p>
+
+                    <div class="password-display">
+                        <input type="text" id="generated-passphrase" readonly value="Klicke auf 'Generieren'">
+                        <button class="btn-icon" id="copy-passphrase-btn" title="Kopieren">
+                            📋
+                        </button>
+                        <button class="btn-icon" id="refresh-passphrase-btn" title="Neu generieren">
+                            🔄
+                        </button>
+                    </div>
+
+                    <div class="settings">
+                        <div class="setting-group">
+                            <label for="num-words">
+                                Anzahl Wörter: <span id="num-words-value">4</span>
+                            </label>
+                            <input type="range" id="num-words" min="2" max="8" value="4">
+                        </div>
+
+                        <div class="setting-group">
+                            <label for="separator">
+                                Trennzeichen:
+                            </label>
+                            <select id="separator">
+                                <option value="-">Bindestrich (-)</option>
+                                <option value="_">Unterstrich (_)</option>
+                                <option value=".">Punkt (.)</option>
+                                <option value=" ">Leerzeichen</option>
+                                <option value="">Kein Trenner</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-group">
+                            <label>
+                                <input type="checkbox" id="capitalize" checked>
+                                Wörter großschreiben
+                            </label>
+                        </div>
+
+                        <div class="setting-group">
+                            <label>
+                                <input type="checkbox" id="add-number" checked>
+                                Zahl am Ende hinzufügen
+                            </label>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="generate-passphrase-btn">🔤 Passphrase generieren</button>
+
+                    <div id="passphrase-strength" class="strength-result" style="display: none;">
+                        <h3>Passphrase-Stärke</h3>
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="passphrase-strength-fill"></div>
+                        </div>
+                        <div class="strength-info">
+                            <span id="passphrase-strength-label">-</span>
+                            <span id="passphrase-strength-score">0/100</span>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>💡 Warum Passphrasen?</h4>
+                        <ul>
+                            <li>Leichter zu merken als zufällige Zeichen</li>
+                            <li>Trotzdem sehr sicher (lange Länge)</li>
+                            <li>Beispiel: <code>Correct-Horse-Battery-Staple</code></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BREACH CHECK TAB -->
+            <div class="tab-pane" id="breach">
+                <div class="card">
+                    <h2>⚠️ Data Breach Check</h2>
+                    <p class="info-text">Prüfe, ob dein Passwort in bekannten Datenlecks aufgetaucht ist</p>
+
+                    <div class="password-input-group">
+                        <input type="password" id="breach-password" placeholder="Passwort eingeben...">
+                        <button class="btn-icon" id="toggle-breach-visibility">👁️</button>
+                    </div>
+
+                    <button class="btn btn-warning" id="breach-check-btn">🔍 Auf Leaks prüfen</button>
+
+                    <div id="breach-result" class="breach-result" style="display: none;"></div>
+
+                    <div class="info-box">
+                        <h4>🔒 Datenschutz</h4>
+                        <p>
+                            Dein Passwort wird <strong>niemals</strong> vollständig übertragen!
+                            Wir nutzen die <a href="https://haveibeenpwned.com/" target="_blank">Have I Been Pwned</a> API
+                            mit k-Anonymität: Nur die ersten 5 Zeichen des Hash werden gesendet.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Made with ❤️ | Deine Passwörter bleiben privat und werden nicht gespeichert</p>
+        </footer>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
