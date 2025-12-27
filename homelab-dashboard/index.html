@@ -8,20 +8,69 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Dark Mode Toggle -->
-    <div class="theme-toggle">
-        <button id="theme-toggle-btn" aria-label="Theme umschalten">
-            <i class="fas fa-moon"></i>
-        </button>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-server"></i> Dashboard</h2>
+            <button class="close-sidebar" id="close-sidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" id="nav-dashboard">
+                <i class="fas fa-home"></i> Übersicht
+            </a>
+            <a href="#" class="nav-item" id="nav-services">
+                <i class="fas fa-list"></i> Services
+            </a>
+            <a href="#" class="nav-item" id="nav-groups">
+                <i class="fas fa-folder"></i> Gruppen
+            </a>
+            <a href="#" class="nav-item" id="nav-stats">
+                <i class="fas fa-chart-line"></i> Statistiken
+            </a>
+            <a href="#" class="nav-item" id="nav-webhooks">
+                <i class="fas fa-webhook"></i> Webhooks
+            </a>
+            <a href="#" class="nav-item" id="nav-settings">
+                <i class="fas fa-cog"></i> Einstellungen
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span id="sidebar-username">Admin</span>
+            </div>
+            <button class="logout-btn" id="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Abmelden
+            </button>
+        </div>
     </div>
 
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <h1><i class="fas fa-server"></i> Mein Homelab Dashboard</h1>
-            <p class="subtitle">Zentrale Übersicht aller Services</p>
+    <!-- Overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+        <!-- Dark Mode Toggle -->
+        <div class="theme-toggle">
+            <button id="theme-toggle-btn" aria-label="Theme umschalten">
+                <i class="fas fa-moon"></i>
+            </button>
         </div>
-    </header>
+
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <button class="menu-btn" id="menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1><i class="fas fa-server"></i> Mein Homelab Dashboard</h1>
+                <p class="subtitle">Zentrale Übersicht aller Services</p>
+            </div>
+        </header>
 
     <!-- Main Content -->
     <main class="container">
@@ -222,12 +271,13 @@
     </div>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2025 Homelab Dashboard | <a href="#" id="export-config">Konfiguration exportieren</a> | <a href="#" id="import-config-link">Konfiguration importieren</a></p>
-            <input type="file" id="import-config" accept=".json" style="display: none;">
-        </div>
-    </footer>
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2025 Homelab Dashboard | <a href="#" id="export-config">Konfiguration exportieren</a> | <a href="#" id="import-config-link">Konfiguration importieren</a></p>
+                <input type="file" id="import-config" accept=".json" style="display: none;">
+            </div>
+        </footer>
+    </div> <!-- End main-wrapper -->
 
     <script src="app-v2.js"></script>
 </body>

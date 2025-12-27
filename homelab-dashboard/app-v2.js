@@ -766,6 +766,42 @@ class ServiceManager {
     // Event Listeners Setup
     // ===========================
     setupEventListeners() {
+        // Sidebar menu toggle
+        const menuBtn = document.getElementById('menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const closeSidebar = document.getElementById('close-sidebar');
+
+        if (menuBtn && sidebar && sidebarOverlay) {
+            menuBtn.addEventListener('click', () => {
+                sidebar.classList.add('active');
+                sidebarOverlay.classList.add('active');
+            });
+
+            closeSidebar?.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+            });
+
+            sidebarOverlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+            });
+        }
+
+        // Navigation items
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+
+                // Close sidebar on mobile after selecting
+                sidebar?.classList.remove('active');
+                sidebarOverlay?.classList.remove('active');
+            });
+        });
+
         // Theme toggle
         const themeBtn = document.getElementById('theme-toggle-btn');
         if (themeBtn) {
