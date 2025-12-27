@@ -796,6 +796,12 @@ class ServiceManager {
                 document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
                 item.classList.add('active');
 
+                // Handle navigation actions
+                const navId = item.id;
+                if (navId === 'nav-settings') {
+                    this.openSettingsModal();
+                }
+
                 // Close sidebar on mobile after selecting
                 sidebar?.classList.remove('active');
                 sidebarOverlay?.classList.remove('active');
@@ -964,6 +970,79 @@ class ServiceManager {
 
     generateId() {
         return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    // ===========================
+    // Settings Modal
+    // ===========================
+    openSettingsModal() {
+        const modal = document.getElementById('settings-modal');
+        if (modal) {
+            modal.classList.add('active');
+            this.setupSettingsListeners();
+        }
+    }
+
+    closeSettingsModal() {
+        const modal = document.getElementById('settings-modal');
+        if (modal) {
+            modal.classList.remove('active');
+        }
+    }
+
+    setupSettingsListeners() {
+        // Close button
+        document.getElementById('close-settings-btn')?.addEventListener('click', () => this.closeSettingsModal());
+
+        // Tab switching
+        document.querySelectorAll('.settings-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.dataset.tab;
+
+                // Update active tab
+                document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                // Update active content
+                document.querySelectorAll('.settings-tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(`tab-${targetTab}`)?.classList.add('active');
+            });
+        });
+
+        // Password change form
+        document.getElementById('change-password-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            if (newPassword !== confirmPassword) {
+                alert('Die Passwörter stimmen nicht überein!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/change-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        current_password: currentPassword,
+                        new_password: newPassword
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Passwort erfolgreich geändert!');
+                    document.getElementById('change-password-form').reset();
+                } else {
+                    const data = await response.json();
+                    alert(data.error || 'Fehler beim Ändern des Passworts');
+                }
+            } catch (error) {
+                alert('Fehler beim Ändern des Passworts');
+            }
+        });
     }
 }
 

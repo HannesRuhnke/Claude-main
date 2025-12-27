@@ -879,3 +879,90 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--text-primary);
 }
+
+/* ===========================
+   Settings Modal
+   =========================== */
+.settings-tabs {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.settings-tab {
+    background: none;
+    border: none;
+    padding: var(--spacing-md) var(--spacing-lg);
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: var(--transition);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.settings-tab:hover {
+    color: var(--text-primary);
+    background: var(--bg-primary);
+}
+
+.settings-tab.active {
+    color: var(--color-blue);
+    border-bottom-color: var(--color-blue);
+    font-weight: 600;
+}
+
+.settings-tab-content {
+    display: none;
+}
+
+.settings-tab-content.active {
+    display: block;
+}
+
+.settings-tab-content h3 {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+.backup-controls {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.backup-info {
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background: var(--bg-primary);
+    border-radius: var(--border-radius);
+}
+
+.backup-info ul {
+    list-style: none;
+    padding: 0;
+}
+
+.backup-info li {
+    padding: var(--spacing-sm);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.system-info {
+    padding: var(--spacing-md);
+    background: var(--bg-primary);
+    border-radius: var(--border-radius);
+    margin-bottom: var(--spacing-lg);
+}
+
+.system-info p {
+    margin: var(--spacing-sm) 0;
+    color: var(--text-secondary);
+}
+
+.system-info strong {
+    color: var(--text-primary);
+}

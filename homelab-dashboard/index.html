@@ -270,6 +270,124 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog"></i> Einstellungen</h2>
+                <button class="close-btn" id="close-settings-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-tabs">
+                    <button class="settings-tab active" data-tab="account">
+                        <i class="fas fa-user"></i> Account
+                    </button>
+                    <button class="settings-tab" data-tab="email">
+                        <i class="fas fa-envelope"></i> Email
+                    </button>
+                    <button class="settings-tab" data-tab="backup">
+                        <i class="fas fa-database"></i> Backup
+                    </button>
+                    <button class="settings-tab" data-tab="system">
+                        <i class="fas fa-server"></i> System
+                    </button>
+                </div>
+
+                <!-- Account Tab -->
+                <div class="settings-tab-content active" id="tab-account">
+                    <h3>Passwort ändern</h3>
+                    <form id="change-password-form">
+                        <div class="form-group">
+                            <label for="current-password">Aktuelles Passwort *</label>
+                            <input type="password" id="current-password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="new-password">Neues Passwort *</label>
+                            <input type="password" id="new-password" required minlength="8">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-password">Passwort bestätigen *</label>
+                            <input type="password" id="confirm-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Passwort ändern
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Email Tab -->
+                <div class="settings-tab-content" id="tab-email">
+                    <h3>Email-Einstellungen</h3>
+                    <form id="email-settings-form">
+                        <div class="form-group">
+                            <label for="smtp-host">SMTP Host</label>
+                            <input type="text" id="smtp-host" placeholder="smtp.gmail.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="smtp-port">SMTP Port</label>
+                            <input type="number" id="smtp-port" placeholder="587">
+                        </div>
+                        <div class="form-group">
+                            <label for="smtp-user">SMTP Benutzername</label>
+                            <input type="email" id="smtp-user" placeholder="your-email@gmail.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="smtp-password">SMTP Passwort</label>
+                            <input type="password" id="smtp-password" placeholder="App-Passwort">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Email-Einstellungen speichern
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="test-email-btn">
+                            <i class="fas fa-paper-plane"></i> Test-Email senden
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Backup Tab -->
+                <div class="settings-tab-content" id="tab-backup">
+                    <h3>Backup-Einstellungen</h3>
+                    <div class="backup-controls">
+                        <button class="btn btn-primary" id="create-backup-btn">
+                            <i class="fas fa-download"></i> Backup jetzt erstellen
+                        </button>
+                        <button class="btn btn-secondary" id="download-backup-btn">
+                            <i class="fas fa-file-download"></i> Letztes Backup herunterladen
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="auto-backup-enabled">
+                            Automatische Backups aktivieren
+                        </label>
+                    </div>
+                    <div class="backup-info">
+                        <h4>Letzte Backups:</h4>
+                        <ul id="backup-list">
+                            <li>Lade Backup-Liste...</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- System Tab -->
+                <div class="settings-tab-content" id="tab-system">
+                    <h3>System-Informationen</h3>
+                    <div class="system-info">
+                        <p><strong>Version:</strong> V4 Ultimate Edition</p>
+                        <p><strong>Datenbank:</strong> SQLite</p>
+                        <p><strong>Services:</strong> <span id="system-service-count">-</span></p>
+                        <p><strong>Uptime:</strong> <span id="system-uptime">-</span></p>
+                    </div>
+                    <button class="btn btn-danger" id="clear-all-data-btn">
+                        <i class="fas fa-trash-alt"></i> Alle Daten löschen (Vorsicht!)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
         <footer class="footer">
             <div class="container">
