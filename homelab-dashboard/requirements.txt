@@ -14,8 +14,5 @@ Flask-Limiter==3.5.0
 requests==2.31.0
 urllib3==2.1.0
 
-# Security
-cryptography==41.0.7
-
 # Scheduling
 schedule==1.2.0
