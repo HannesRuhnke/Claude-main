@@ -22,21 +22,31 @@ class ServiceManager {
     }
 
     async init() {
-        // Check authentication first
-        const isAuth = await this.checkAuth();
-        if (!isAuth) {
-            window.location.href = 'login.html';
-            return;
-        }
+        try {
+            // Check authentication first
+            const isAuth = await this.checkAuth();
+            if (!isAuth) {
+                window.location.href = 'login.html';
+                return;
+            }
 
-        await this.loadData();
-        this.renderServices();
-        this.updateStats();
-        this.startClock();
-        this.startUptimeCounter();
-        this.setupEventListeners();
-        this.loadTheme();
-        this.startStatusChecks();
+            // Always setup event listeners first - even if data loading fails
+            this.setupEventListeners();
+            this.loadTheme();
+            this.startClock();
+            this.startUptimeCounter();
+
+            // Load data and render (can fail gracefully)
+            await this.loadData();
+            this.renderServices();
+            this.updateStats();
+            this.startStatusChecks();
+        } catch (error) {
+            console.error('Initialization error:', error);
+            // Ensure event listeners are set up even if there's an error
+            this.setupEventListeners();
+            this.loadTheme();
+        }
     }
 
     // ===========================
