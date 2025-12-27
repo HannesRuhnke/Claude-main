@@ -36,8 +36,8 @@ services:
       - PGID=${PGID:-1000}
 
     volumes:
-      # Datenbank (persistiert alle Daten)
-      - ./data/homelab.db:/app/homelab.db
+      # Daten-Verzeichnis (enthält Datenbank und persistente Daten)
+      - ./data:/data
 
       # Backups (automatische & manuelle Backups)
       - ./data/backups:/app/backups

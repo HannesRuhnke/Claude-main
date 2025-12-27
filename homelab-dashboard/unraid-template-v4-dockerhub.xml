@@ -48,7 +48,7 @@
   <Config Name="WebUI Port" Target="5000" Default="5000" Mode="tcp" Description="Web-Interface Port" Type="Port" Display="always" Required="true" Mask="false">5000</Config>
 
   <!-- Volume Configuration -->
-  <Config Name="Database" Target="/app/homelab.db" Default="/mnt/user/appdata/homelab-dashboard/homelab.db" Mode="rw" Description="SQLite Datenbank (enth&#xE4;lt alle Daten)" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/homelab-dashboard/homelab.db</Config>
+  <Config Name="Data Directory" Target="/data" Default="/mnt/user/appdata/homelab-dashboard/data" Mode="rw" Description="Daten-Verzeichnis (enth&#xE4;lt Datenbank und persistente Daten)" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/homelab-dashboard/data</Config>
 
   <Config Name="Backups" Target="/app/backups" Default="/mnt/user/appdata/homelab-dashboard/backups" Mode="rw" Description="Backup-Verzeichnis (automatische &amp; manuelle Backups)" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/homelab-dashboard/backups</Config>
 

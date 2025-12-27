@@ -26,8 +26,8 @@ LABEL maintainer="homelab@local" \
 
 # Non-root User erstellen
 RUN useradd -m -u 1000 homelab && \
-    mkdir -p /app/backups /app/screenshots && \
-    chown -R homelab:homelab /app
+    mkdir -p /app/backups /app/screenshots /data && \
+    chown -R homelab:homelab /app /data
 
 WORKDIR /app
 
@@ -60,7 +60,7 @@ ENV PATH=/home/homelab/.local/bin:$PATH \
 EXPOSE 5000
 
 # Volumes für Persistenz
-VOLUME ["/app/backups", "/app/screenshots", "/app/homelab.db"]
+VOLUME ["/app/backups", "/app/screenshots", "/data"]
 
 # Health Check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \

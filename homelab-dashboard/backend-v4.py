@@ -45,7 +45,7 @@ limiter = Limiter(
 )
 
 # Konfiguration
-DATABASE = 'homelab.db'
+DATABASE = '/data/homelab.db'
 BACKUP_DIR = 'backups'
 SCREENSHOTS_DIR = 'screenshots'
 DEFAULT_PASSWORD_HASH = hashlib.sha256('homelab2025'.encode()).hexdigest()
