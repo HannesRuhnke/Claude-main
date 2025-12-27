@@ -1,0 +1,113 @@
+version: '3.8'
+
+services:
+  homelab-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile-v4
+    image: homelab-dashboard:v4-ultimate
+    container_name: homelab-dashboard-v4
+
+    ports:
+      - "5000:5000"
+
+    environment:
+      # SMTP Configuration (für Email-Notifications)
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+      - SMTP_FROM=${SMTP_FROM:-${SMTP_USER}}
+
+      # Health Check Configuration
+      - HEALTH_CHECK_INTERVAL=300          # 5 Minuten
+      - HEALTH_CHECK_TIMEOUT=10            # 10 Sekunden
+
+      # Backup Configuration
+      - AUTO_BACKUP_ENABLED=true
+      - AUTO_BACKUP_TIME=02:00             # 2 Uhr nachts
+      - AUTO_BACKUP_RETENTION=7            # Behalte 7 Backups
+
+      # Timezone
+      - TZ=Europe/Berlin
+
+      # Optional: PUID/PGID für Unraid
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+
+    volumes:
+      # Datenbank (persistiert alle Daten)
+      - ./data/homelab.db:/app/homelab.db
+
+      # Backups (automatische & manuelle Backups)
+      - ./data/backups:/app/backups
+
+      # Screenshots (Service-Screenshots)
+      - ./data/screenshots:/app/screenshots
+
+      # Optional: Logs
+      - ./data/logs:/app/logs
+
+    restart: unless-stopped
+
+    # Resource Limits (optional, anpassen nach Bedarf)
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+    # Health Check
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:5000/api/system/status', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Logging Configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Network (optional, für erweiterte Netzwerk-Konfiguration)
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    driver: bridge
+
+# ===========================
+# Usage Instructions
+# ===========================
+#
+# 1. Erstelle .env Datei für SMTP-Credentials:
+#    SMTP_USER=your-email@gmail.com
+#    SMTP_PASSWORD=your-app-password
+#    SMTP_FROM=your-email@gmail.com
+#
+# 2. Starte Container:
+#    docker-compose -f docker-compose-v4.yml up -d
+#
+# 3. Zugriff:
+#    http://localhost:5000
+#    Username: admin
+#    Password: homelab2025
+#
+# 4. Email-Funktionen nutzen:
+#    - Passwort zurücksetzen
+#    - Service-Down-Notifications
+#    - Incident-Alerts
+#
+# 5. Logs anschauen:
+#    docker-compose -f docker-compose-v4.yml logs -f
+#
+# 6. Stoppen:
+#    docker-compose -f docker-compose-v4.yml down
+#

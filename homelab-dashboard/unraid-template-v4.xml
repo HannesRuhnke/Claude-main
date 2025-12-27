@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>Homelab-Dashboard-V4-Ultimate</Name>
+  <Repository>homelab-dashboard:v4-ultimate</Repository>
+  <Registry>https://hub.docker.com/</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/yourusername/homelab-dashboard</Support>
+  <Project>https://github.com/yourusername/homelab-dashboard</Project>
+  <Overview>
+    Homelab Dashboard V4 Ultimate Edition - Das ultimative Dashboard f&#xFC;r dein Homelab!
+
+    &#x1F680; NEU in V4 ULTIMATE:
+    - &#x2705; API Rate Limiting (Brute-Force-Schutz)
+    - &#x2705; Email-Benachrichtigungen (SMTP)
+    - &#x2705; Passwort-Reset via Email
+    - &#x2705; Echte HTTP/HTTPS Health Checks
+    - &#x2705; SSL-Zertifikat-&#xDC;berwachung
+    - &#x2705; Globale Suche
+    - &#x2705; Webhook-System
+    - &#x2705; Alert-System
+    - &#x2705; Automatische Backups
+    - &#x2705; Datenbank-Migrationen
+
+    Standard-Login:
+    Username: admin
+    Passwort: homelab2025
+
+    WICHTIG: Passwort nach erstem Login &#xE4;ndern!
+  </Overview>
+  <Category>Tools: Status:Stable</Category>
+  <WebUI>http://[IP]:[PORT:5000]</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/yourusername/homelab-dashboard/main/unraid-template-v4.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/yourusername/homelab-dashboard/main/icon.png</Icon>
+  <ExtraParams>--restart=unless-stopped</ExtraParams>
+  <PostArgs/>
+  <CPUset/>
+  <DateInstalled/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires/>
+  <Config Name="WebUI Port" Target="5000" Default="5000" Mode="tcp" Description="Web-Interface Port" Type="Port" Display="always" Required="true" Mask="false">5000</Config>
+
+  <!-- Datenbank -->
+  <Config Name="Database" Target="/app/homelab.db" Default="/mnt/user/appdata/homelab-dashboard-v4/homelab.db" Mode="rw" Description="SQLite Datenbank (enth&#xE4;lt alle Daten)" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/homelab-dashboard-v4/homelab.db</Config>
+
+  <!-- Backups -->
+  <Config Name="Backups" Target="/app/backups" Default="/mnt/user/appdata/homelab-dashboard-v4/backups" Mode="rw" Description="Backup-Verzeichnis (automatische &amp; manuelle Backups)" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/homelab-dashboard-v4/backups</Config>
+
+  <!-- Screenshots -->
+  <Config Name="Screenshots" Target="/app/screenshots" Default="/mnt/user/appdata/homelab-dashboard-v4/screenshots" Mode="rw" Description="Screenshot-Verzeichnis" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/homelab-dashboard-v4/screenshots</Config>
+
+  <!-- Logs (optional) -->
+  <Config Name="Logs" Target="/app/logs" Default="/mnt/user/appdata/homelab-dashboard-v4/logs" Mode="rw" Description="Log-Verzeichnis (optional)" Type="Path" Display="advanced" Required="false" Mask="false">/mnt/user/appdata/homelab-dashboard-v4/logs</Config>
+
+  <!-- SMTP Configuration -->
+  <Config Name="SMTP Host" Target="SMTP_HOST" Default="smtp.gmail.com" Mode="" Description="SMTP Server (z.B. smtp.gmail.com)" Type="Variable" Display="always" Required="false" Mask="false">smtp.gmail.com</Config>
+
+  <Config Name="SMTP Port" Target="SMTP_PORT" Default="587" Mode="" Description="SMTP Port (Standard: 587 f&#xFC;r TLS)" Type="Variable" Display="always" Required="false" Mask="false">587</Config>
+
+  <Config Name="SMTP User" Target="SMTP_USER" Default="" Mode="" Description="SMTP Benutzername (Email-Adresse)" Type="Variable" Display="always" Required="false" Mask="false"></Config>
+
+  <Config Name="SMTP Password" Target="SMTP_PASSWORD" Default="" Mode="" Description="SMTP Passwort (App-Passwort bei Gmail)" Type="Variable" Display="always" Required="false" Mask="true"></Config>
+
+  <Config Name="SMTP From" Target="SMTP_FROM" Default="" Mode="" Description="Absender-Email (leer = SMTP_USER)" Type="Variable" Display="always" Required="false" Mask="false"></Config>
+
+  <!-- Health Check Configuration -->
+  <Config Name="Health Check Interval" Target="HEALTH_CHECK_INTERVAL" Default="300" Mode="" Description="Health Check Intervall in Sekunden (Standard: 300 = 5 Min)" Type="Variable" Display="advanced" Required="false" Mask="false">300</Config>
+
+  <Config Name="Health Check Timeout" Target="HEALTH_CHECK_TIMEOUT" Default="10" Mode="" Description="Health Check Timeout in Sekunden" Type="Variable" Display="advanced" Required="false" Mask="false">10</Config>
+
+  <!-- Backup Configuration -->
+  <Config Name="Auto Backup Enabled" Target="AUTO_BACKUP_ENABLED" Default="true" Mode="" Description="Automatische Backups aktivieren (true/false)" Type="Variable" Display="always" Required="false" Mask="false">true</Config>
+
+  <Config Name="Auto Backup Time" Target="AUTO_BACKUP_TIME" Default="02:00" Mode="" Description="Uhrzeit f&#xFC;r automatische Backups (Format: HH:MM)" Type="Variable" Display="always" Required="false" Mask="false">02:00</Config>
+
+  <Config Name="Auto Backup Retention" Target="AUTO_BACKUP_RETENTION" Default="7" Mode="" Description="Anzahl zu behaltender automatischer Backups" Type="Variable" Display="advanced" Required="false" Mask="false">7</Config>
+
+  <!-- Timezone -->
+  <Config Name="Timezone" Target="TZ" Default="Europe/Berlin" Mode="" Description="Zeitzone (z.B. Europe/Berlin, America/New_York)" Type="Variable" Display="advanced" Required="false" Mask="false">Europe/Berlin</Config>
+
+  <!-- PUID/PGID für Unraid -->
+  <Config Name="PUID" Target="PUID" Default="99" Mode="" Description="User ID (Standard: 99 f&#xFC;r Unraid 'nobody')" Type="Variable" Display="advanced" Required="false" Mask="false">99</Config>
+
+  <Config Name="PGID" Target="PGID" Default="100" Mode="" Description="Group ID (Standard: 100 f&#xFC;r Unraid 'users')" Type="Variable" Display="advanced" Required="false" Mask="false">100</Config>
+
+  <!-- Resource Limits (Unraid 6.12+) -->
+  <Config Name="CPU Limit" Target="" Default="2.0" Mode="" Description="CPU Limit (Anzahl Kerne)" Type="Variable" Display="advanced" Required="false" Mask="false">2.0</Config>
+
+  <Config Name="Memory Limit" Target="" Default="1G" Mode="" Description="RAM Limit (z.B. 1G, 512M)" Type="Variable" Display="advanced" Required="false" Mask="false">1G</Config>
+</Container>

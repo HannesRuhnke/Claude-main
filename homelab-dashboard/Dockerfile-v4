@@ -1,0 +1,73 @@
+# Dockerfile für Homelab Dashboard V4 Ultimate Edition
+# Multi-stage build für optimale Image-Größe
+
+FROM python:3.11-slim as builder
+
+WORKDIR /app
+
+# System-Dependencies für SSL und andere Libraries
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python Dependencies installieren
+COPY requirements-v4.txt .
+RUN pip install --no-cache-dir --user -r requirements-v4.txt
+
+# ===========================
+# Finales Image
+# ===========================
+FROM python:3.11-slim
+
+LABEL maintainer="homelab@local" \
+      version="4.0" \
+      description="Homelab Dashboard V4 Ultimate Edition with Email, Health Checks, Webhooks"
+
+# Non-root User erstellen
+RUN useradd -m -u 1000 homelab && \
+    mkdir -p /app/backups /app/screenshots && \
+    chown -R homelab:homelab /app
+
+WORKDIR /app
+
+# Python Dependencies von Builder kopieren
+COPY --from=builder /root/.local /home/homelab/.local
+
+# Application Files kopieren
+COPY --chown=homelab:homelab backend-v4.py .
+COPY --chown=homelab:homelab index.html .
+COPY --chown=homelab:homelab styles.css .
+COPY --chown=homelab:homelab app-v2.js .
+COPY --chown=homelab:homelab login.html .
+
+# Environment Variables mit Defaults
+ENV PATH=/home/homelab/.local/bin:$PATH \
+    PYTHONUNBUFFERED=1 \
+    SMTP_HOST=smtp.gmail.com \
+    SMTP_PORT=587 \
+    SMTP_USER= \
+    SMTP_PASSWORD= \
+    SMTP_FROM= \
+    HEALTH_CHECK_INTERVAL=300 \
+    HEALTH_CHECK_TIMEOUT=10 \
+    AUTO_BACKUP_ENABLED=true \
+    AUTO_BACKUP_TIME=02:00 \
+    AUTO_BACKUP_RETENTION=7 \
+    TZ=Europe/Berlin
+
+# Port expose
+EXPOSE 5000
+
+# Volumes für Persistenz
+VOLUME ["/app/backups", "/app/screenshots", "/app/homelab.db"]
+
+# Health Check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD python -c "import requests; requests.get('http://localhost:5000/api/system/status', timeout=5)" || exit 1
+
+# User wechseln
+USER homelab
+
+# Startkommando
+CMD ["python", "backend-v4.py"]
