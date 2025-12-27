@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>Homelab-Dashboard-V4</Name>
+  <Repository>YOUR_DOCKERHUB_USERNAME/homelab-dashboard:latest</Repository>
+  <Registry>https://hub.docker.com/r/YOUR_DOCKERHUB_USERNAME/homelab-dashboard</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/YOUR_GITHUB_USERNAME/Claude-main</Support>
+  <Project>https://github.com/YOUR_GITHUB_USERNAME/Claude-main</Project>
+  <Overview>
+    &#x1F680; Homelab Dashboard V4 ULTIMATE EDITION - Production-Ready Dashboard!
+
+    &#x2705; 10 Must-Have Enterprise-Features:
+    - API Rate Limiting &amp; Brute-Force-Schutz
+    - Email-Benachrichtigungen (SMTP)
+    - Passwort-Reset via Email
+    - Echte HTTP/HTTPS Health Checks
+    - SSL-Zertifikat-&#xDC;berwachung
+    - Globale Suche
+    - Webhook-System (Discord/Slack)
+    - Alert-System
+    - Automatische Backups
+    - Datenbank-Migrationen
+
+    &#x1F512; Standard-Login:
+    Username: admin
+    Passwort: homelab2025
+
+    &#x26A0;&#xFE0F; WICHTIG: Passwort nach erstem Login &#xE4;ndern!
+
+    &#x1F4E7; F&#xFC;r Email-Features: SMTP-Daten konfigurieren (Gmail/Outlook)
+  </Overview>
+  <Category>Tools: Status:Stable</Category>
+  <WebUI>http://[IP]:[PORT:5000]</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/Claude-main/main/homelab-dashboard/unraid-template-v4-dockerhub.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/Claude-main/main/homelab-dashboard/icon.png</Icon>
+  <ExtraParams>--restart=unless-stopped</ExtraParams>
+  <PostArgs/>
+  <CPUset/>
+  <DateInstalled/>
+  <DonateText>Buy me a coffee &#x2615;</DonateText>
+  <DonateLink>https://www.buymeacoffee.com/YOUR_USERNAME</DonateLink>
+  <Requires/>
+
+  <!-- Port Configuration -->
+  <Config Name="WebUI Port" Target="5000" Default="5000" Mode="tcp" Description="Web-Interface Port" Type="Port" Display="always" Required="true" Mask="false">5000</Config>
+
+  <!-- Volume Configuration -->
+  <Config Name="Database" Target="/app/homelab.db" Default="/mnt/user/appdata/homelab-dashboard/homelab.db" Mode="rw" Description="SQLite Datenbank (enth&#xE4;lt alle Daten)" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/homelab-dashboard/homelab.db</Config>
+
+  <Config Name="Backups" Target="/app/backups" Default="/mnt/user/appdata/homelab-dashboard/backups" Mode="rw" Description="Backup-Verzeichnis (automatische &amp; manuelle Backups)" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/homelab-dashboard/backups</Config>
+
+  <Config Name="Screenshots" Target="/app/screenshots" Default="/mnt/user/appdata/homelab-dashboard/screenshots" Mode="rw" Description="Screenshot-Verzeichnis" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/homelab-dashboard/screenshots</Config>
+
+  <Config Name="Logs" Target="/app/logs" Default="/mnt/user/appdata/homelab-dashboard/logs" Mode="rw" Description="Log-Verzeichnis (optional)" Type="Path" Display="advanced" Required="false" Mask="false">/mnt/user/appdata/homelab-dashboard/logs</Config>
+
+  <!-- SMTP Email Configuration -->
+  <Config Name="SMTP Host" Target="SMTP_HOST" Default="smtp.gmail.com" Mode="" Description="SMTP Server (z.B. smtp.gmail.com f&#xFC;r Gmail)" Type="Variable" Display="always" Required="false" Mask="false">smtp.gmail.com</Config>
+
+  <Config Name="SMTP Port" Target="SMTP_PORT" Default="587" Mode="" Description="SMTP Port (Standard: 587 f&#xFC;r TLS)" Type="Variable" Display="always" Required="false" Mask="false">587</Config>
+
+  <Config Name="SMTP User" Target="SMTP_USER" Default="" Mode="" Description="SMTP Benutzername (Email-Adresse). F&#xFC;r Gmail: Erstelle App-Passwort unter https://myaccount.google.com/security" Type="Variable" Display="always" Required="false" Mask="false"></Config>
+
+  <Config Name="SMTP Password" Target="SMTP_PASSWORD" Default="" Mode="" Description="SMTP Passwort (App-Passwort bei Gmail/Outlook, NICHT normales Passwort!)" Type="Variable" Display="always" Required="false" Mask="true"></Config>
+
+  <Config Name="SMTP From" Target="SMTP_FROM" Default="" Mode="" Description="Absender-Email (leer = verwendet SMTP_USER)" Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+
+  <!-- Health Check Configuration -->
+  <Config Name="Health Check Interval" Target="HEALTH_CHECK_INTERVAL" Default="300" Mode="" Description="Health Check Intervall in Sekunden (Standard: 300 = 5 Minuten)" Type="Variable" Display="advanced" Required="false" Mask="false">300</Config>
+
+  <Config Name="Health Check Timeout" Target="HEALTH_CHECK_TIMEOUT" Default="10" Mode="" Description="Health Check Timeout in Sekunden (Standard: 10)" Type="Variable" Display="advanced" Required="false" Mask="false">10</Config>
+
+  <!-- Automatic Backup Configuration -->
+  <Config Name="Auto Backup Enabled" Target="AUTO_BACKUP_ENABLED" Default="true" Mode="" Description="Automatische Backups aktivieren (true/false)" Type="Variable" Display="always" Required="false" Mask="false">true</Config>
+
+  <Config Name="Auto Backup Time" Target="AUTO_BACKUP_TIME" Default="02:00" Mode="" Description="Uhrzeit f&#xFC;r automatische Backups (Format: HH:MM, z.B. 02:00 f&#xFC;r 2 Uhr nachts)" Type="Variable" Display="always" Required="false" Mask="false">02:00</Config>
+
+  <Config Name="Auto Backup Retention" Target="AUTO_BACKUP_RETENTION" Default="7" Mode="" Description="Anzahl zu behaltender automatischer Backups (Standard: 7)" Type="Variable" Display="advanced" Required="false" Mask="false">7</Config>
+
+  <!-- System Configuration -->
+  <Config Name="Timezone" Target="TZ" Default="Europe/Berlin" Mode="" Description="Zeitzone (z.B. Europe/Berlin, America/New_York, Asia/Tokyo)" Type="Variable" Display="advanced" Required="false" Mask="false">Europe/Berlin</Config>
+
+  <Config Name="PUID" Target="PUID" Default="99" Mode="" Description="User ID (Standard: 99 f&#xFC;r Unraid 'nobody')" Type="Variable" Display="advanced" Required="false" Mask="false">99</Config>
+
+  <Config Name="PGID" Target="PGID" Default="100" Mode="" Description="Group ID (Standard: 100 f&#xFC;r Unraid 'users')" Type="Variable" Display="advanced" Required="false" Mask="false">100</Config>
+</Container>
