@@ -1673,9 +1673,818 @@ def get_services():
 
     return jsonify(services)
 
-# Da die Datei sehr lang wird, füge ich hier die kritischen neuen Endpunkte hinzu
-# Die restlichen V3-Endpunkte (users, roles, analytics, backups, themes, preferences)
-# bleiben im Wesentlichen gleich
+@app.route('/api/services', methods=['POST'])
+@login_required
+@permission_required('create_services')
+def create_service():
+    """Neuen Service erstellen"""
+    data = request.json
+
+    # Validierung
+    if not data.get('name') or not data.get('url'):
+        return jsonify({'error': 'Name und URL sind erforderlich'}), 400
+
+    # ID generieren
+    service_id = data.get('id') or secrets.token_urlsafe(8)
+
+    db = get_db()
+    try:
+        db.execute('''
+            INSERT INTO services (
+                id, name, description, url, icon, category, color,
+                background_image, is_favorite, notes, group_id, owner_id, created_by,
+                health_check_enabled, health_check_url, health_check_method,
+                health_check_interval, expected_status_code, ssl_check_enabled
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            service_id,
+            data['name'],
+            data.get('description', ''),
+            data['url'],
+            data.get('icon', 'fa-server'),
+            data.get('category', 'General'),
+            data.get('color', 'blue'),
+            data.get('background_image', ''),
+            data.get('is_favorite', 0),
+            data.get('notes', ''),
+            data.get('group_id'),
+            session['user_id'],
+            session['user_id'],
+            data.get('health_check_enabled', 1),
+            data.get('health_check_url'),
+            data.get('health_check_method', 'GET'),
+            data.get('health_check_interval', 300),
+            data.get('expected_status_code', 200),
+            data.get('ssl_check_enabled', 1)
+        ))
+
+        # Tags hinzufügen
+        if data.get('tags'):
+            for tag_name in data['tags']:
+                # Tag suchen oder erstellen
+                tag = db.execute('SELECT id FROM tags WHERE name = ?', (tag_name,)).fetchone()
+                if not tag:
+                    cursor = db.execute('INSERT INTO tags (name, created_by) VALUES (?, ?)',
+                                      (tag_name, session['user_id']))
+                    tag_id = cursor.lastrowid
+                else:
+                    tag_id = tag['id']
+
+                db.execute('INSERT INTO service_tags (service_id, tag_id) VALUES (?, ?)',
+                          (service_id, tag_id))
+
+        # Initial status erstellen
+        db.execute('''
+            INSERT INTO service_status (service_id, is_online, last_checked)
+            VALUES (?, 0, CURRENT_TIMESTAMP)
+        ''', (service_id,))
+
+        # Stats initialisieren
+        db.execute('''
+            INSERT INTO service_stats (service_id, total_clicks, total_views)
+            VALUES (?, 0, 0)
+        ''', (service_id,))
+
+        db.commit()
+        db.close()
+
+        log_audit('create', 'service', service_id, None, data)
+        log_analytics_event('service_created', {'service_id': service_id})
+
+        # Trigger Webhook
+        trigger_webhooks('service_created', {'service': data})
+
+        return jsonify({'success': True, 'id': service_id})
+
+    except Exception as e:
+        db.close()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/services/<service_id>', methods=['GET'])
+@login_required
+def get_service(service_id):
+    """Einzelnen Service abrufen"""
+    db = get_db()
+    cursor = db.execute('''
+        SELECT s.*, GROUP_CONCAT(DISTINCT t.name) as tags, u.username as owner_name,
+               ss.is_online, ss.response_time, ss.last_checked, ss.ssl_valid,
+               ss.ssl_days_remaining, ss.ssl_expires_at, ss.last_error,
+               stats.total_clicks, stats.total_views, stats.uptime_percentage,
+               stats.last_24h_uptime, stats.last_7d_uptime, stats.last_30d_uptime,
+               stats.avg_response_time
+        FROM services s
+        LEFT JOIN service_tags st ON s.id = st.service_id
+        LEFT JOIN tags t ON st.tag_id = t.id
+        LEFT JOIN users u ON s.owner_id = u.id
+        LEFT JOIN service_status ss ON s.id = ss.service_id
+        LEFT JOIN service_stats stats ON s.id = stats.service_id
+        WHERE s.id = ?
+        GROUP BY s.id
+    ''', (service_id,))
+
+    service = cursor.fetchone()
+    db.close()
+
+    if not service:
+        return jsonify({'error': 'Service nicht gefunden'}), 404
+
+    service_dict = dict(service)
+    service_dict['tags'] = service_dict['tags'].split(',') if service_dict['tags'] else []
+
+    log_analytics_event('service_viewed', {'service_id': service_id}, service_id)
+
+    return jsonify(service_dict)
+
+@app.route('/api/services/<service_id>', methods=['PUT'])
+@login_required
+def update_service(service_id):
+    """Service aktualisieren"""
+    data = request.json
+
+    db = get_db()
+
+    # Prüfe ob Service existiert
+    old_service = db.execute('SELECT * FROM services WHERE id = ?', (service_id,)).fetchone()
+    if not old_service:
+        db.close()
+        return jsonify({'error': 'Service nicht gefunden'}), 404
+
+    # Prüfe Berechtigung (nur Owner oder Admin)
+    if old_service['owner_id'] != session['user_id'] and not has_permission(session['user_id'], 'all'):
+        db.close()
+        return jsonify({'error': 'Keine Berechtigung'}), 403
+
+    try:
+        # Update Service
+        db.execute('''
+            UPDATE services SET
+                name = ?, description = ?, url = ?, icon = ?, category = ?,
+                color = ?, background_image = ?, is_favorite = ?, notes = ?,
+                group_id = ?, health_check_enabled = ?, health_check_url = ?,
+                health_check_method = ?, health_check_interval = ?,
+                expected_status_code = ?, ssl_check_enabled = ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        ''', (
+            data.get('name', old_service['name']),
+            data.get('description', old_service['description']),
+            data.get('url', old_service['url']),
+            data.get('icon', old_service['icon']),
+            data.get('category', old_service['category']),
+            data.get('color', old_service['color']),
+            data.get('background_image', old_service['background_image']),
+            data.get('is_favorite', old_service['is_favorite']),
+            data.get('notes', old_service['notes']),
+            data.get('group_id', old_service['group_id']),
+            data.get('health_check_enabled', old_service['health_check_enabled']),
+            data.get('health_check_url', old_service['health_check_url']),
+            data.get('health_check_method', old_service['health_check_method']),
+            data.get('health_check_interval', old_service['health_check_interval']),
+            data.get('expected_status_code', old_service['expected_status_code']),
+            data.get('ssl_check_enabled', old_service['ssl_check_enabled']),
+            service_id
+        ))
+
+        # Tags aktualisieren
+        if 'tags' in data:
+            # Alte Tags löschen
+            db.execute('DELETE FROM service_tags WHERE service_id = ?', (service_id,))
+
+            # Neue Tags hinzufügen
+            for tag_name in data['tags']:
+                tag = db.execute('SELECT id FROM tags WHERE name = ?', (tag_name,)).fetchone()
+                if not tag:
+                    cursor = db.execute('INSERT INTO tags (name, created_by) VALUES (?, ?)',
+                                      (tag_name, session['user_id']))
+                    tag_id = cursor.lastrowid
+                else:
+                    tag_id = tag['id']
+
+                db.execute('INSERT INTO service_tags (service_id, tag_id) VALUES (?, ?)',
+                          (service_id, tag_id))
+
+        db.commit()
+        db.close()
+
+        log_audit('update', 'service', service_id, dict(old_service), data)
+        log_analytics_event('service_updated', {'service_id': service_id}, service_id)
+
+        trigger_webhooks('service_updated', {'service_id': service_id, 'changes': data})
+
+        return jsonify({'success': True})
+
+    except Exception as e:
+        db.close()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/services/<service_id>', methods=['DELETE'])
+@login_required
+def delete_service(service_id):
+    """Service löschen"""
+    db = get_db()
+
+    # Prüfe ob Service existiert
+    service = db.execute('SELECT * FROM services WHERE id = ?', (service_id,)).fetchone()
+    if not service:
+        db.close()
+        return jsonify({'error': 'Service nicht gefunden'}), 404
+
+    # Prüfe Berechtigung
+    if service['owner_id'] != session['user_id'] and not has_permission(session['user_id'], 'all'):
+        db.close()
+        return jsonify({'error': 'Keine Berechtigung'}), 403
+
+    try:
+        # Lösche Service (CASCADE löscht automatisch Tags, Status, Stats, etc.)
+        db.execute('DELETE FROM services WHERE id = ?', (service_id,))
+        db.commit()
+        db.close()
+
+        log_audit('delete', 'service', service_id, dict(service))
+        log_analytics_event('service_deleted', {'service_id': service_id})
+
+        trigger_webhooks('service_deleted', {'service_id': service_id, 'name': service['name']})
+
+        return jsonify({'success': True})
+
+    except Exception as e:
+        db.close()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/services/<service_id>/status', methods=['POST'])
+@login_required
+def check_service_status(service_id):
+    """Manuellen Health Check für Service durchführen"""
+    db = get_db()
+    cursor = db.execute('SELECT * FROM services WHERE id = ?', (service_id,))
+    service = cursor.fetchone()
+
+    if not service:
+        db.close()
+        return jsonify({'error': 'Service nicht gefunden'}), 404
+
+    # Health Check durchführen
+    result = check_service_health(service)
+
+    # Status in DB aktualisieren
+    db.execute('''
+        INSERT OR REPLACE INTO service_status
+        (service_id, is_online, response_time, status_code, ssl_valid, ssl_expires_at,
+         ssl_days_remaining, last_checked, last_error, total_checks, failed_checks)
+        VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?,
+                COALESCE((SELECT total_checks FROM service_status WHERE service_id = ?), 0) + 1,
+                COALESCE((SELECT failed_checks FROM service_status WHERE service_id = ?), 0) + ?)
+    ''', (
+        service_id,
+        result['is_online'],
+        result['response_time'],
+        result['status_code'],
+        result['ssl_valid'],
+        result['ssl_expires_at'],
+        result['ssl_days_remaining'],
+        result['error_message'],
+        service_id,
+        service_id,
+        0 if result['is_online'] else 1
+    ))
+
+    # History eintragen
+    db.execute('''
+        INSERT INTO uptime_history (service_id, is_online, response_time, status_code, error_message)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (service_id, result['is_online'], result['response_time'],
+          result['status_code'], result['error_message']))
+
+    db.commit()
+    db.close()
+
+    log_analytics_event('manual_health_check', {'service_id': service_id}, service_id)
+
+    return jsonify(result)
+
+@app.route('/api/services/status', methods=['GET'])
+@login_required
+def get_all_service_statuses():
+    """Status aller Services abrufen"""
+    db = get_db()
+    cursor = db.execute('''
+        SELECT ss.*, s.name, s.url
+        FROM service_status ss
+        JOIN services s ON ss.service_id = s.id
+        ORDER BY s.name
+    ''')
+    statuses = [dict(row) for row in cursor.fetchall()]
+    db.close()
+
+    return jsonify(statuses)
+
+# ===========================
+# GROUPS API
+# ===========================
+
+@app.route('/api/groups', methods=['GET'])
+@login_required
+def get_groups():
+    """Alle Gruppen abrufen"""
+    db = get_db()
+    cursor = db.execute('''
+        SELECT g.*, u.username as created_by_name,
+               COUNT(DISTINCT s.id) as service_count
+        FROM groups g
+        LEFT JOIN users u ON g.created_by = u.id
+        LEFT JOIN services s ON s.group_id = g.id
+        GROUP BY g.id
+        ORDER BY g.sort_order, g.name
+    ''')
+    groups = [dict(row) for row in cursor.fetchall()]
+    db.close()
+
+    return jsonify(groups)
+
+@app.route('/api/groups', methods=['POST'])
+@login_required
+@permission_required('create_services')
+def create_group():
+    """Neue Gruppe erstellen"""
+    data = request.json
+
+    if not data.get('name'):
+        return jsonify({'error': 'Name ist erforderlich'}), 400
+
+    db = get_db()
+    try:
+        cursor = db.execute('''
+            INSERT INTO groups (name, icon, color, parent_id, sort_order, created_by)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (
+            data['name'],
+            data.get('icon', 'fa-folder'),
+            data.get('color', 'blue'),
+            data.get('parent_id'),
+            data.get('sort_order', 0),
+            session['user_id']
+        ))
+        group_id = cursor.lastrowid
+        db.commit()
+        db.close()
+
+        log_audit('create', 'group', group_id, None, data)
+
+        return jsonify({'success': True, 'id': group_id})
+
+    except Exception as e:
+        db.close()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/groups/<int:group_id>', methods=['GET'])
+@login_required
+def get_group(group_id):
+    """Einzelne Gruppe abrufen"""
+    db = get_db()
+    cursor = db.execute('''
+        SELECT g.*, u.username as created_by_name,
+               COUNT(DISTINCT s.id) as service_count
+        FROM groups g
+        LEFT JOIN users u ON g.created_by = u.id
+        LEFT JOIN services s ON s.group_id = g.id
+        WHERE g.id = ?
+        GROUP BY g.id
+    ''', (group_id,))
+
+    group = cursor.fetchone()
+    db.close()
+
+    if not group:
+        return jsonify({'error': 'Gruppe nicht gefunden'}), 404
+
+    return jsonify(dict(group))
+
+@app.route('/api/groups/<int:group_id>', methods=['PUT'])
+@login_required
+def update_group(group_id):
+    """Gruppe aktualisieren"""
+    data = request.json
+
+    db = get_db()
+    old_group = db.execute('SELECT * FROM groups WHERE id = ?', (group_id,)).fetchone()
+
+    if not old_group:
+        db.close()
+        return jsonify({'error': 'Gruppe nicht gefunden'}), 404
+
+    try:
+        db.execute('''
+            UPDATE groups SET
+                name = ?, icon = ?, color = ?, parent_id = ?, sort_order = ?
+            WHERE id = ?
+        ''', (
+            data.get('name', old_group['name']),
+            data.get('icon', old_group['icon']),
+            data.get('color', old_group['color']),
+            data.get('parent_id', old_group['parent_id']),
+            data.get('sort_order', old_group['sort_order']),
+            group_id
+        ))
+        db.commit()
+        db.close()
+
+        log_audit('update', 'group', group_id, dict(old_group), data)
+
+        return jsonify({'success': True})
+
+    except Exception as e:
+        db.close()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/groups/<int:group_id>', methods=['DELETE'])
+@login_required
+def delete_group(group_id):
+    """Gruppe löschen"""
+    db = get_db()
+
+    # Prüfe ob Gruppe Services hat
+    service_count = db.execute('''
+        SELECT COUNT(*) as c FROM services WHERE group_id = ?
+    ''', (group_id,)).fetchone()['c']
+
+    if service_count > 0:
+        db.close()
+        return jsonify({'error': f'Gruppe enthält noch {service_count} Services. Bitte zuerst verschieben oder löschen.'}), 400
+
+    group = db.execute('SELECT * FROM groups WHERE id = ?', (group_id,)).fetchone()
+    if not group:
+        db.close()
+        return jsonify({'error': 'Gruppe nicht gefunden'}), 404
+
+    try:
+        db.execute('DELETE FROM groups WHERE id = ?', (group_id,))
+        db.commit()
+        db.close()
+
+        log_audit('delete', 'group', group_id, dict(group))
+
+        return jsonify({'success': True})
+
+    except Exception as e:
+        db.close()
+        return jsonify({'error': str(e)}), 500
+
+# ===========================
+# TAGS API
+# ===========================
+
+@app.route('/api/tags', methods=['GET'])
+@login_required
+def get_tags():
+    """Alle Tags abrufen"""
+    db = get_db()
+    cursor = db.execute('''
+        SELECT t.*, u.username as created_by_name,
+               COUNT(DISTINCT st.service_id) as usage_count
+        FROM tags t
+        LEFT JOIN users u ON t.created_by = u.id
+        LEFT JOIN service_tags st ON t.id = st.tag_id
+        GROUP BY t.id
+        ORDER BY t.name
+    ''')
+    tags = [dict(row) for row in cursor.fetchall()]
+    db.close()
+
+    return jsonify(tags)
+
+@app.route('/api/tags', methods=['POST'])
+@login_required
+@permission_required('create_services')
+def create_tag():
+    """Neuen Tag erstellen"""
+    data = request.json
+
+    if not data.get('name'):
+        return jsonify({'error': 'Name ist erforderlich'}), 400
+
+    db = get_db()
+
+    # Prüfe ob Tag bereits existiert
+    existing = db.execute('SELECT id FROM tags WHERE name = ?', (data['name'],)).fetchone()
+    if existing:
+        db.close()
+        return jsonify({'error': 'Tag existiert bereits', 'id': existing['id']}), 409
+
+    try:
+        cursor = db.execute('''
+            INSERT INTO tags (name, color, created_by)
+            VALUES (?, ?, ?)
+        ''', (
+            data['name'],
+            data.get('color', 'blue'),
+            session['user_id']
+        ))
+        tag_id = cursor.lastrowid
+        db.commit()
+        db.close()
+
+        log_audit('create', 'tag', tag_id, None, data)
+
+        return jsonify({'success': True, 'id': tag_id})
+
+    except Exception as e:
+        db.close()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/tags/<int:tag_id>', methods=['DELETE'])
+@login_required
+def delete_tag(tag_id):
+    """Tag löschen"""
+    db = get_db()
+
+    tag = db.execute('SELECT * FROM tags WHERE id = ?', (tag_id,)).fetchone()
+    if not tag:
+        db.close()
+        return jsonify({'error': 'Tag nicht gefunden'}), 404
+
+    try:
+        # Entferne Tag von allen Services
+        db.execute('DELETE FROM service_tags WHERE tag_id = ?', (tag_id,))
+        # Lösche Tag
+        db.execute('DELETE FROM tags WHERE id = ?', (tag_id,))
+        db.commit()
+        db.close()
+
+        log_audit('delete', 'tag', tag_id, dict(tag))
+
+        return jsonify({'success': True})
+
+    except Exception as e:
+        db.close()
+        return jsonify({'error': str(e)}), 500
+
+# ===========================
+# BACKUPS API
+# ===========================
+
+@app.route('/api/backups', methods=['GET'])
+@login_required
+@permission_required('all')
+def get_backups():
+    """Alle Backups auflisten"""
+    db = get_db()
+    cursor = db.execute('''
+        SELECT b.*, u.username as created_by_name
+        FROM backups b
+        LEFT JOIN users u ON b.created_by = u.id
+        ORDER BY b.created_at DESC
+    ''')
+    backups = [dict(row) for row in cursor.fetchall()]
+    db.close()
+
+    # Prüfe ob Dateien noch existieren
+    for backup in backups:
+        backup_path = os.path.join(BACKUP_DIR, backup['filename'])
+        backup['file_exists'] = os.path.exists(backup_path)
+
+    return jsonify(backups)
+
+@app.route('/api/backups', methods=['POST'])
+@login_required
+@permission_required('all')
+def create_backup():
+    """Manuelles Backup erstellen"""
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    backup_filename = f'homelab_backup_manual_{timestamp}.zip'
+    backup_path = os.path.join(BACKUP_DIR, backup_filename)
+
+    try:
+        with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            # Datenbank hinzufügen
+            if os.path.exists(DATABASE):
+                zipf.write(DATABASE, os.path.basename(DATABASE))
+
+            # Screenshots hinzufügen
+            if os.path.exists(SCREENSHOTS_DIR):
+                for root, dirs, files in os.walk(SCREENSHOTS_DIR):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        arcname = os.path.relpath(file_path, os.path.dirname(SCREENSHOTS_DIR))
+                        zipf.write(file_path, arcname)
+
+        # In DB eintragen
+        file_size = os.path.getsize(backup_path)
+        db = get_db()
+        cursor = db.execute('''
+            INSERT INTO backups (filename, file_size, backup_type, status, created_by)
+            VALUES (?, ?, 'manual', 'completed', ?)
+        ''', (backup_filename, file_size, session['user_id']))
+        backup_id = cursor.lastrowid
+        db.commit()
+        db.close()
+
+        log_audit('create', 'backup', backup_id)
+        log_analytics_event('backup_created', {'type': 'manual', 'size': file_size})
+
+        return jsonify({
+            'success': True,
+            'id': backup_id,
+            'filename': backup_filename,
+            'file_size': file_size
+        })
+
+    except Exception as e:
+        db = get_db()
+        db.execute('''
+            INSERT INTO backups (filename, backup_type, status, error_message, created_by)
+            VALUES (?, 'manual', 'failed', ?, ?)
+        ''', (backup_filename, str(e), session['user_id']))
+        db.commit()
+        db.close()
+
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/backups/<int:backup_id>', methods=['GET'])
+@login_required
+@permission_required('all')
+def download_backup(backup_id):
+    """Backup herunterladen"""
+    db = get_db()
+    backup = db.execute('SELECT * FROM backups WHERE id = ?', (backup_id,)).fetchone()
+    db.close()
+
+    if not backup:
+        return jsonify({'error': 'Backup nicht gefunden'}), 404
+
+    backup_path = os.path.join(BACKUP_DIR, backup['filename'])
+
+    if not os.path.exists(backup_path):
+        return jsonify({'error': 'Backup-Datei existiert nicht'}), 404
+
+    log_analytics_event('backup_downloaded', {'backup_id': backup_id})
+
+    return send_file(
+        backup_path,
+        as_attachment=True,
+        download_name=backup['filename'],
+        mimetype='application/zip'
+    )
+
+@app.route('/api/backups/<int:backup_id>', methods=['DELETE'])
+@login_required
+@permission_required('all')
+def delete_backup(backup_id):
+    """Backup löschen"""
+    db = get_db()
+    backup = db.execute('SELECT * FROM backups WHERE id = ?', (backup_id,)).fetchone()
+
+    if not backup:
+        db.close()
+        return jsonify({'error': 'Backup nicht gefunden'}), 404
+
+    # Datei löschen
+    backup_path = os.path.join(BACKUP_DIR, backup['filename'])
+    if os.path.exists(backup_path):
+        try:
+            os.remove(backup_path)
+        except Exception as e:
+            db.close()
+            return jsonify({'error': f'Fehler beim Löschen der Datei: {str(e)}'}), 500
+
+    # DB-Eintrag löschen
+    db.execute('DELETE FROM backups WHERE id = ?', (backup_id,))
+    db.commit()
+    db.close()
+
+    log_audit('delete', 'backup', backup_id, dict(backup))
+
+    return jsonify({'success': True})
+
+# ===========================
+# STATISTICS API
+# ===========================
+
+@app.route('/api/statistics', methods=['GET'])
+@login_required
+def get_statistics():
+    """Dashboard-Statistiken abrufen"""
+    db = get_db()
+
+    # Basis-Statistiken
+    total_services = db.execute('SELECT COUNT(*) as c FROM services').fetchone()['c']
+    total_users = db.execute('SELECT COUNT(*) as c FROM users WHERE is_active = 1').fetchone()['c']
+    total_groups = db.execute('SELECT COUNT(*) as c FROM groups').fetchone()['c']
+    total_tags = db.execute('SELECT COUNT(*) as c FROM tags').fetchone()['c']
+
+    # Service-Status
+    online_services = db.execute('''
+        SELECT COUNT(*) as c FROM service_status WHERE is_online = 1
+    ''').fetchone()['c']
+    offline_services = total_services - online_services
+
+    # Incidents
+    active_incidents = db.execute('''
+        SELECT COUNT(*) as c FROM incidents WHERE ended_at IS NULL
+    ''').fetchone()['c']
+    total_incidents_24h = db.execute('''
+        SELECT COUNT(*) as c FROM incidents
+        WHERE started_at >= datetime('now', '-1 day')
+    ''').fetchone()['c']
+
+    # SSL-Zertifikate
+    ssl_expiring_soon = db.execute('''
+        SELECT COUNT(*) as c FROM service_status
+        WHERE ssl_days_remaining IS NOT NULL AND ssl_days_remaining < 30 AND ssl_days_remaining > 0
+    ''').fetchone()['c']
+    ssl_expired = db.execute('''
+        SELECT COUNT(*) as c FROM service_status
+        WHERE ssl_days_remaining IS NOT NULL AND ssl_days_remaining <= 0
+    ''').fetchone()['c']
+
+    # Durchschnittliche Response Time
+    avg_response_time = db.execute('''
+        SELECT AVG(response_time) as avg FROM service_status
+        WHERE response_time IS NOT NULL
+    ''').fetchone()['avg'] or 0
+
+    # Uptime-Prozentsätze
+    overall_uptime_24h = db.execute('''
+        SELECT AVG(uptime) as avg FROM (
+            SELECT AVG(is_online) * 100 as uptime
+            FROM uptime_history
+            WHERE checked_at >= datetime('now', '-1 day')
+            GROUP BY service_id
+        )
+    ''').fetchone()['avg'] or 0
+
+    overall_uptime_7d = db.execute('''
+        SELECT AVG(uptime) as avg FROM (
+            SELECT AVG(is_online) * 100 as uptime
+            FROM uptime_history
+            WHERE checked_at >= datetime('now', '-7 days')
+            GROUP BY service_id
+        )
+    ''').fetchone()['avg'] or 0
+
+    # Top 5 Services (nach Clicks)
+    top_services = db.execute('''
+        SELECT s.name, s.id, stats.total_clicks, stats.uptime_percentage
+        FROM services s
+        LEFT JOIN service_stats stats ON s.id = stats.service_id
+        ORDER BY stats.total_clicks DESC
+        LIMIT 5
+    ''').fetchall()
+
+    # Recent Activities (letzte 10 Audit-Einträge)
+    recent_activities = db.execute('''
+        SELECT a.*, u.username
+        FROM audit_log a
+        LEFT JOIN users u ON a.user_id = u.id
+        ORDER BY a.created_at DESC
+        LIMIT 10
+    ''').fetchall()
+
+    # Service-Status-Verteilung
+    status_distribution = {
+        'online': online_services,
+        'offline': offline_services,
+        'warning': ssl_expiring_soon,
+        'critical': ssl_expired
+    }
+
+    # Analytics (letzte 7 Tage)
+    daily_events = db.execute('''
+        SELECT
+            DATE(created_at) as date,
+            COUNT(*) as event_count
+        FROM analytics_events
+        WHERE created_at >= datetime('now', '-7 days')
+        GROUP BY DATE(created_at)
+        ORDER BY date
+    ''').fetchall()
+
+    db.close()
+
+    return jsonify({
+        'overview': {
+            'total_services': total_services,
+            'total_users': total_users,
+            'total_groups': total_groups,
+            'total_tags': total_tags,
+            'online_services': online_services,
+            'offline_services': offline_services,
+            'active_incidents': active_incidents
+        },
+        'performance': {
+            'avg_response_time': round(avg_response_time, 2),
+            'overall_uptime_24h': round(overall_uptime_24h, 2),
+            'overall_uptime_7d': round(overall_uptime_7d, 2)
+        },
+        'security': {
+            'ssl_expiring_soon': ssl_expiring_soon,
+            'ssl_expired': ssl_expired,
+            'total_incidents_24h': total_incidents_24h
+        },
+        'status_distribution': status_distribution,
+        'top_services': [dict(row) for row in top_services],
+        'recent_activities': [dict(row) for row in recent_activities],
+        'daily_events': [dict(row) for row in daily_events]
+    })
 
 # ===========================
 # System Status & Health

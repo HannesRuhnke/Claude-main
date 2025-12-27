@@ -1043,6 +1043,74 @@ class ServiceManager {
                 alert('Fehler beim Ändern des Passworts');
             }
         });
+
+        // Backup buttons
+        document.getElementById('create-backup-btn')?.addEventListener('click', async () => {
+            try {
+                const response = await fetch(`${API_BASE}/backups`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    alert('Backup erfolgreich erstellt!');
+                    this.loadBackupList();
+                } else {
+                    alert('Fehler beim Erstellen des Backups');
+                }
+            } catch (error) {
+                alert('Fehler beim Erstellen des Backups');
+            }
+        });
+
+        document.getElementById('download-backup-btn')?.addEventListener('click', async () => {
+            try {
+                const response = await fetch(`${API_BASE}/backups`, {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const backups = await response.json();
+                    if (backups.length > 0) {
+                        const latestBackup = backups[0];
+                        window.location.href = `${API_BASE}/backups/${latestBackup.id}`;
+                    } else {
+                        alert('Keine Backups verfügbar');
+                    }
+                } else {
+                    alert('Fehler beim Laden der Backups');
+                }
+            } catch (error) {
+                alert('Fehler beim Laden der Backups');
+            }
+        });
+
+        // Load backup list
+        this.loadBackupList();
+    }
+
+    async loadBackupList() {
+        try {
+            const response = await fetch(`${API_BASE}/backups`, {
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const backups = await response.json();
+                const backupList = document.getElementById('backup-list');
+                if (backupList) {
+                    if (backups.length === 0) {
+                        backupList.innerHTML = '<li>Keine Backups vorhanden</li>';
+                    } else {
+                        backupList.innerHTML = backups.slice(0, 5).map(backup => `
+                            <li>${backup.filename} - ${new Date(backup.created_at).toLocaleString()}</li>
+                        `).join('');
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load backups:', error);
+        }
     }
 }
 
