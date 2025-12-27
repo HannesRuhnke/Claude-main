@@ -2530,6 +2530,306 @@ def system_status():
     })
 
 # ===========================
+# Service Actions
+# ===========================
+
+@app.route('/api/services/<service_id>/favorite', methods=['POST'])
+@login_required
+def toggle_service_favorite(service_id):
+    """Toggle favorite status for service"""
+    data = request.json
+    is_favorite = data.get('is_favorite', 0)
+
+    db = get_db()
+    try:
+        db.execute('UPDATE services SET is_favorite = ? WHERE id = ?', (is_favorite, service_id))
+        db.commit()
+        db.close()
+
+        log_audit('update', 'service', service_id, None, {'is_favorite': is_favorite})
+        return jsonify({'success': True})
+    except Exception as e:
+        db.close()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/services/reorder', methods=['POST'])
+@login_required
+@permission_required('edit_services')
+def reorder_services():
+    """Reorder services based on provided order"""
+    data = request.json
+    order = data.get('order', [])
+
+    if not order:
+        return jsonify({'error': 'No order provided'}), 400
+
+    db = get_db()
+    try:
+        for index, service_id in enumerate(order):
+            db.execute('UPDATE services SET sort_order = ? WHERE id = ?', (index, service_id))
+        db.commit()
+        db.close()
+
+        log_audit('update', 'service', 'multiple', None, {'action': 'reorder', 'count': len(order)})
+        return jsonify({'success': True})
+    except Exception as e:
+        db.close()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/services/<service_id>/check-status', methods=['POST'])
+@login_required
+def check_service_status_alt(service_id):
+    """Alternative endpoint for checking service status (matches frontend calls)"""
+    return check_service_status(service_id)
+
+@app.route('/api/services/<service_id>/tags', methods=['POST'])
+@login_required
+@permission_required('edit_services')
+def add_tag_to_service(service_id):
+    """Add tag to service"""
+    data = request.json
+    tag_id = data.get('tag_id')
+
+    if not tag_id:
+        return jsonify({'error': 'Tag ID required'}), 400
+
+    db = get_db()
+    try:
+        # Check if already exists
+        existing = db.execute('SELECT 1 FROM service_tags WHERE service_id = ? AND tag_id = ?',
+                            (service_id, tag_id)).fetchone()
+        if existing:
+            db.close()
+            return jsonify({'error': 'Tag already added'}), 400
+
+        db.execute('INSERT INTO service_tags (service_id, tag_id) VALUES (?, ?)',
+                  (service_id, tag_id))
+        db.commit()
+        db.close()
+
+        log_audit('create', 'service_tag', None, None, {'service_id': service_id, 'tag_id': tag_id})
+        return jsonify({'success': True})
+    except Exception as e:
+        db.close()
+        return jsonify({'error': str(e)}), 500
+
+# ===========================
+# Import/Export
+# ===========================
+
+@app.route('/api/export', methods=['GET'])
+@login_required
+def export_config():
+    """Export all services, groups, and tags as JSON"""
+    db = get_db()
+
+    # Get all services with their tags
+    services_cursor = db.execute('''
+        SELECT s.*, GROUP_CONCAT(t.name) as tags
+        FROM services s
+        LEFT JOIN service_tags st ON s.id = st.service_id
+        LEFT JOIN tags t ON st.tag_id = t.id
+        GROUP BY s.id
+    ''')
+    services = [dict(row) for row in services_cursor.fetchall()]
+
+    # Convert tags from string to list
+    for service in services:
+        if service['tags']:
+            service['tags'] = service['tags'].split(',')
+        else:
+            service['tags'] = []
+
+    # Get all groups
+    groups_cursor = db.execute('SELECT * FROM groups ORDER BY sort_order, name')
+    groups = [dict(row) for row in groups_cursor.fetchall()]
+
+    # Get all tags
+    tags_cursor = db.execute('SELECT * FROM tags ORDER BY name')
+    tags = [dict(row) for row in tags_cursor.fetchall()]
+
+    db.close()
+
+    config = {
+        'version': 'V4',
+        'exported_at': datetime.now().isoformat(),
+        'services': services,
+        'groups': groups,
+        'tags': tags
+    }
+
+    return jsonify(config)
+
+@app.route('/api/import', methods=['POST'])
+@login_required
+@permission_required('admin')
+def import_config():
+    """Import services, groups, and tags from JSON"""
+    data = request.json
+
+    if not data or 'services' not in data:
+        return jsonify({'error': 'Invalid import data'}), 400
+
+    db = get_db()
+    try:
+        # Import groups first
+        if 'groups' in data:
+            for group in data['groups']:
+                # Check if group exists
+                existing = db.execute('SELECT id FROM groups WHERE name = ?', (group['name'],)).fetchone()
+                if not existing:
+                    db.execute('''
+                        INSERT INTO groups (name, icon, color, parent_id, sort_order, created_by)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                    ''', (
+                        group['name'],
+                        group.get('icon', 'fa-folder'),
+                        group.get('color', 'blue'),
+                        group.get('parent_id'),
+                        group.get('sort_order', 0),
+                        session['user_id']
+                    ))
+
+        # Import tags
+        if 'tags' in data:
+            for tag in data['tags']:
+                existing = db.execute('SELECT id FROM tags WHERE name = ?', (tag['name'],)).fetchone()
+                if not existing:
+                    db.execute('INSERT INTO tags (name, color, created_by) VALUES (?, ?, ?)',
+                             (tag['name'], tag.get('color', 'blue'), session['user_id']))
+
+        # Import services
+        for service in data['services']:
+            service_id = service.get('id', secrets.token_urlsafe(16))
+
+            db.execute('''
+                INSERT OR REPLACE INTO services
+                (id, name, description, url, icon, category, color, background_image,
+                 is_favorite, notes, group_id, owner_id, updated_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                service_id,
+                service['name'],
+                service.get('description', ''),
+                service['url'],
+                service.get('icon', 'fa-server'),
+                service.get('category', 'other'),
+                service.get('color', 'blue'),
+                service.get('background_image', ''),
+                service.get('is_favorite', 0),
+                service.get('notes', ''),
+                service.get('group_id'),
+                session['user_id'],
+                session['user_id']
+            ))
+
+            # Add tags if provided
+            if service.get('tags'):
+                for tag_name in service['tags']:
+                    tag = db.execute('SELECT id FROM tags WHERE name = ?', (tag_name,)).fetchone()
+                    if tag:
+                        db.execute('INSERT OR IGNORE INTO service_tags (service_id, tag_id) VALUES (?, ?)',
+                                 (service_id, tag['id']))
+
+        db.commit()
+        db.close()
+
+        log_audit('import', 'config', None, None, {'service_count': len(data['services'])})
+        return jsonify({'success': True, 'imported': len(data['services'])})
+
+    except Exception as e:
+        db.close()
+        return jsonify({'error': str(e)}), 500
+
+# ===========================
+# Email Management
+# ===========================
+
+@app.route('/api/email/settings', methods=['POST'])
+@login_required
+@permission_required('admin')
+def save_email_settings():
+    """Save email settings to database"""
+    data = request.json
+
+    db = get_db()
+    try:
+        # Store email settings in settings table
+        for key, value in data.items():
+            db.execute('''
+                INSERT OR REPLACE INTO settings (key, value, updated_by, updated_at)
+                VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+            ''', (f'email_{key}', str(value), session['user_id']))
+
+        db.commit()
+        db.close()
+
+        log_audit('update', 'settings', 'email', None, {'keys': list(data.keys())})
+        return jsonify({'success': True})
+    except Exception as e:
+        db.close()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/email/test', methods=['POST'])
+@login_required
+@permission_required('admin')
+def test_email():
+    """Send test email"""
+    if not EMAIL_ENABLED:
+        return jsonify({'error': 'Email not configured'}), 400
+
+    try:
+        send_email(
+            SMTP_USER,
+            'Homelab Dashboard Test Email',
+            'This is a test email from your Homelab Dashboard V4.',
+            '<h2>Test Email</h2><p>If you receive this, your email configuration is working correctly!</p>'
+        )
+
+        log_audit('action', 'email', 'test', None, {'recipient': SMTP_USER})
+        return jsonify({'success': True, 'message': f'Test email sent to {SMTP_USER}'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ===========================
+# System Management
+# ===========================
+
+@app.route('/api/system/clear-data', methods=['POST'])
+@login_required
+@permission_required('admin')
+def clear_all_data():
+    """Clear all services, groups, tags, and related data (DANGEROUS!)"""
+    data = request.json
+    confirm = data.get('confirm', False)
+
+    if not confirm:
+        return jsonify({'error': 'Confirmation required'}), 400
+
+    db = get_db()
+    try:
+        # Delete in correct order due to foreign key constraints
+        db.execute('DELETE FROM service_tags')
+        db.execute('DELETE FROM service_status')
+        db.execute('DELETE FROM service_stats')
+        db.execute('DELETE FROM uptime_history')
+        db.execute('DELETE FROM incidents')
+        db.execute('DELETE FROM services')
+        db.execute('DELETE FROM groups')
+        db.execute('DELETE FROM tags')
+        db.execute('DELETE FROM audit_log')
+        db.execute('DELETE FROM analytics_events')
+
+        db.commit()
+        db.close()
+
+        log_audit('delete', 'system', 'all_data', None, {'warning': 'ALL DATA DELETED'})
+        return jsonify({'success': True, 'message': 'All data cleared'})
+    except Exception as e:
+        db.close()
+        return jsonify({'error': str(e)}), 500
+
+# ===========================
 # Static Files
 # ===========================
 

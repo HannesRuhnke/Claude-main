@@ -1085,6 +1085,83 @@ class ServiceManager {
             }
         });
 
+        // Email settings form
+        document.getElementById('email-settings-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const emailData = {
+                smtp_host: document.getElementById('smtp-host').value,
+                smtp_port: document.getElementById('smtp-port').value,
+                smtp_user: document.getElementById('smtp-user').value,
+                smtp_password: document.getElementById('smtp-password').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/email/settings`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(emailData)
+                });
+
+                if (response.ok) {
+                    alert('Email-Einstellungen erfolgreich gespeichert!');
+                } else {
+                    alert('Fehler beim Speichern der Email-Einstellungen');
+                }
+            } catch (error) {
+                alert('Fehler beim Speichern der Email-Einstellungen');
+            }
+        });
+
+        // Test email button
+        document.getElementById('test-email-btn')?.addEventListener('click', async () => {
+            try {
+                const response = await fetch(`${API_BASE}/email/test`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(data.message || 'Test-Email erfolgreich gesendet!');
+                } else {
+                    alert(data.error || 'Fehler beim Senden der Test-Email');
+                }
+            } catch (error) {
+                alert('Fehler beim Senden der Test-Email');
+            }
+        });
+
+        // Clear all data button
+        document.getElementById('clear-all-data-btn')?.addEventListener('click', async () => {
+            const confirmed = confirm('WARNUNG: Dies löscht ALLE Daten unwiderruflich! Fortfahren?');
+            if (!confirmed) return;
+
+            const doubleConfirm = confirm('Bist du SICHER? Dies kann nicht rückgängig gemacht werden!');
+            if (!doubleConfirm) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/system/clear-data`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ confirm: true })
+                });
+
+                if (response.ok) {
+                    alert('Alle Daten wurden gelöscht!');
+                    window.location.reload();
+                } else {
+                    const data = await response.json();
+                    alert(data.error || 'Fehler beim Löschen der Daten');
+                }
+            } catch (error) {
+                alert('Fehler beim Löschen der Daten');
+            }
+        });
+
         // Load backup list
         this.loadBackupList();
     }
