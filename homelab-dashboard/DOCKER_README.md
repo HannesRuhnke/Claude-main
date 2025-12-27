@@ -1,8 +1,8 @@
 # Homelab Dashboard V4 Ultimate Edition 🚀
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/YOUR_USERNAME/homelab-dashboard)](https://hub.docker.com/r/YOUR_USERNAME/homelab-dashboard)
-[![Docker Image Size](https://img.shields.io/docker/image-size/YOUR_USERNAME/homelab-dashboard/latest)](https://hub.docker.com/r/YOUR_USERNAME/homelab-dashboard)
-[![GitHub](https://img.shields.io/github/license/YOUR_USERNAME/homelab-dashboard)](https://github.com/YOUR_USERNAME/homelab-dashboard)
+[![Docker Pulls](https://img.shields.io/docker/pulls/hannesruhnke/homelab-dashboard)](https://hub.docker.com/r/hannesruhnke/homelab-dashboard)
+[![Docker Image Size](https://img.shields.io/docker/image-size/hannesruhnke/homelab-dashboard/latest)](https://hub.docker.com/r/hannesruhnke/homelab-dashboard)
+[![GitHub](https://img.shields.io/github/license/hannesruhnke/homelab-dashboard)](https://github.com/hannesruhnke/homelab-dashboard)
 
 **Production-Ready Dashboard für dein Homelab mit Email-Notifications, HTTP Health Checks, SSL-Monitoring, Webhooks und automatischen Backups!**
 
@@ -48,7 +48,7 @@ docker run -d \
   -v $(pwd)/data:/app \
   -e SMTP_USER=your-email@gmail.com \
   -e SMTP_PASSWORD=your-app-password \
-  YOUR_USERNAME/homelab-dashboard:latest
+  hannesruhnke/homelab-dashboard:latest
 ```
 
 ### Docker Compose
@@ -58,7 +58,7 @@ version: '3.8'
 
 services:
   homelab-dashboard:
-    image: YOUR_USERNAME/homelab-dashboard:latest
+    image: hannesruhnke/homelab-dashboard:latest
     container_name: homelab-dashboard
     ports:
       - "5000:5000"
@@ -244,23 +244,23 @@ docker exec homelab-dashboard ls -la /app/backups
 
 ## 📚 Dokumentation
 
-- **Vollständige Anleitung:** [ANLEITUNG-V4.md](https://github.com/YOUR_USERNAME/homelab-dashboard/blob/main/homelab-dashboard/ANLEITUNG-V4.md)
-- **Changelog:** [CHANGELOG.md](https://github.com/YOUR_USERNAME/homelab-dashboard/blob/main/homelab-dashboard/CHANGELOG.md)
-- **Installation:** [INSTALLATION.md](https://github.com/YOUR_USERNAME/homelab-dashboard/blob/main/homelab-dashboard/INSTALLATION.md)
+- **Vollständige Anleitung:** [ANLEITUNG-V4.md](https://github.com/hannesruhnke/homelab-dashboard/blob/main/homelab-dashboard/ANLEITUNG-V4.md)
+- **Changelog:** [CHANGELOG.md](https://github.com/hannesruhnke/homelab-dashboard/blob/main/homelab-dashboard/CHANGELOG.md)
+- **Installation:** [INSTALLATION.md](https://github.com/hannesruhnke/homelab-dashboard/blob/main/homelab-dashboard/INSTALLATION.md)
 
 ---
 
 ## 🤝 Support
 
-- **GitHub:** https://github.com/YOUR_USERNAME/homelab-dashboard
-- **Issues:** https://github.com/YOUR_USERNAME/homelab-dashboard/issues
-- **Discussions:** https://github.com/YOUR_USERNAME/homelab-dashboard/discussions
+- **GitHub:** https://github.com/hannesruhnke/homelab-dashboard
+- **Issues:** https://github.com/hannesruhnke/homelab-dashboard/issues
+- **Discussions:** https://github.com/hannesruhnke/homelab-dashboard/discussions
 
 ---
 
 ## 📜 Lizenz
 
-MIT License - siehe [LICENSE](https://github.com/YOUR_USERNAME/homelab-dashboard/blob/main/LICENSE)
+MIT License - siehe [LICENSE](https://github.com/hannesruhnke/homelab-dashboard/blob/main/LICENSE)
 
 ---
 
@@ -305,4 +305,4 @@ POST /api/auth/forgot-password
 
 **Gebaut mit ❤️ für die Homelab-Community**
 
-🌟 **Star us on GitHub!** → https://github.com/YOUR_USERNAME/homelab-dashboard
+🌟 **Star us on GitHub!** → https://github.com/hannesruhnke/homelab-dashboard

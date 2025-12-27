@@ -166,7 +166,7 @@ git push
 
 Nach erfolgreichem Build:
 
-1. Gehe zu: `https://hub.docker.com/r/DEIN_USERNAME/homelab-dashboard`
+1. Gehe zu: `https://hub.docker.com/r/hannesruhnke/homelab-dashboard`
 2. Sollte **3 Tags** zeigen:
    - `latest`
    - `v4`
@@ -232,7 +232,7 @@ Auswahl [1-3]: 2
 Dein Unraid-Template liegt auf GitHub:
 
 ```
-https://raw.githubusercontent.com/DEIN_GITHUB_USERNAME/Claude-main/main/homelab-dashboard/unraid-template-v4-dockerhub.xml
+https://raw.githubusercontent.com/HannesRuhnke/Claude-main/main/homelab-dashboard/unraid-template-v4-dockerhub.xml
 ```
 
 **Beispiel:**
@@ -259,7 +259,7 @@ Falls du das Template mit der Community teilen willst:
 3. **Add Container**
 4. Bei **Repository:** eingeben:
    ```
-   DEIN_USERNAME/homelab-dashboard:latest
+   hannesruhnke/homelab-dashboard:latest
    ```
    Beispiel: `hannesruhnke/homelab-dashboard:latest`
 
@@ -283,7 +283,7 @@ Falls du das Template mit der Community teilen willst:
 1. **Community Applications** öffnen
 2. **Template URL** hinzufügen:
    - Settings → Template Repositories
-   - URL hinzufügen: `https://raw.githubusercontent.com/DEIN_GITHUB_USERNAME/Claude-main/main/homelab-dashboard/unraid-template-v4-dockerhub.xml`
+   - URL hinzufügen: `https://raw.githubusercontent.com/HannesRuhnke/Claude-main/main/homelab-dashboard/unraid-template-v4-dockerhub.xml`
 
 3. **Apps** → Suche "Homelab Dashboard"
 4. **Install** klicken
@@ -468,7 +468,7 @@ SMTP_PASSWORD=***
 
 **Ergebnis:**
 
-- 🎉 **Fertiges Docker Image:** `DEIN_USERNAME/homelab-dashboard:latest`
+- 🎉 **Fertiges Docker Image:** `hannesruhnke/homelab-dashboard:latest`
 - 🎉 **Automatische Updates:** Bei jedem Push
 - 🎉 **Multi-Platform:** AMD64, ARM64, ARMv7
 - 🎉 **Unraid-Ready:** Direkt installierbar
@@ -493,7 +493,7 @@ SMTP_PASSWORD=***
 2. Check Docker Hub Repository
 3. Check Unraid Container Logs: `docker logs homelab-dashboard`
 
-**GitHub Issues:** https://github.com/DEIN_USERNAME/Claude-main/issues
+**GitHub Issues:** https://github.com/hannesruhnke/Claude-main/issues
 
 ---
 
