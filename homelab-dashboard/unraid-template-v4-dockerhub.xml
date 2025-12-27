@@ -34,8 +34,8 @@
   </Overview>
   <Category>Tools: Status:Stable</Category>
   <WebUI>http://[IP]:[PORT:5000]</WebUI>
-  <TemplateURL>https://raw.githubusercontent.com/HannesRuhnke/Claude-main/main/homelab-dashboard/unraid-template-v4-dockerhub.xml</TemplateURL>
-  <Icon>https://raw.githubusercontent.com/HannesRuhnke/Claude-main/main/homelab-dashboard/icon.png</Icon>
+  <TemplateURL>https://raw.githubusercontent.com/HannesRuhnke/Claude-main/claude/add-claude-documentation-LQM6O/homelab-dashboard/unraid-template-v4-dockerhub.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/HannesRuhnke/Claude-main/claude/add-claude-documentation-LQM6O/homelab-dashboard/icon.png</Icon>
   <ExtraParams>--restart=unless-stopped</ExtraParams>
   <PostArgs/>
   <CPUset/>
