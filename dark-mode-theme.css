@@ -1,0 +1,873 @@
+/* =====================================================
+   DARK MODE THEME - Zum Testen in Chrome DevTools
+   =====================================================
+
+   ANLEITUNG:
+   1. F12 drücken (DevTools öffnen)
+   2. Console Tab öffnen
+   3. Diesen JS-Code eingeben zum Aktivieren:
+      document.documentElement.classList.add('dark-mode');
+
+   Zum Deaktivieren:
+      document.documentElement.classList.remove('dark-mode');
+
+   Oder Toggle:
+      document.documentElement.classList.toggle('dark-mode');
+
+   ===================================================== */
+
+/* =====================================================
+   CSS CUSTOM PROPERTIES (Variablen)
+   ===================================================== */
+
+:root {
+  /* Light Mode (Default) */
+  --cp-bg-primary: #ffffff;
+  --cp-bg-secondary: #f8fafc;
+  --cp-bg-tertiary: #f1f5f9;
+  --cp-bg-card: #ffffff;
+  --cp-bg-input: #ffffff;
+  --cp-bg-sidebar: #002366;
+  --cp-bg-header: #002366;
+
+  --cp-text-primary: #0f172a;
+  --cp-text-secondary: #475569;
+  --cp-text-tertiary: #94a3b8;
+  --cp-text-inverse: #ffffff;
+
+  --cp-border-light: rgba(16, 24, 40, 0.08);
+  --cp-border-medium: rgba(16, 24, 40, 0.15);
+  --cp-border-dark: rgba(16, 24, 40, 0.25);
+
+  --cp-shadow-sm: 0 2px 10px rgba(16, 24, 40, 0.06);
+  --cp-shadow-md: 0 6px 20px rgba(16, 24, 40, 0.08);
+  --cp-shadow-lg: 0 14px 40px rgba(15, 23, 42, 0.25);
+
+  --cp-accent-blue: #002366;
+  --cp-accent-blue-light: #628bd9;
+  --cp-accent-blue-hover: #0a3c9a;
+
+  --cp-success: #22c55e;
+  --cp-warning: #f59e0b;
+  --cp-danger: #ef4444;
+  --cp-info: #99CCFF;
+
+  --cp-link: #002366;
+  --cp-link-hover: #FF3030;
+
+  --cp-panel-bg: #ffffff;
+  --cp-panel-header-bg: #f8fafc;
+
+  --cp-drawer-bg: #ffffff;
+  --cp-drawer-border: rgba(15, 23, 42, 0.12);
+}
+
+/* =====================================================
+   DARK MODE VARIABLES
+   ===================================================== */
+
+html.dark-mode {
+  --cp-bg-primary: #0f172a;
+  --cp-bg-secondary: #1e293b;
+  --cp-bg-tertiary: #334155;
+  --cp-bg-card: #1e293b;
+  --cp-bg-input: #1e293b;
+  --cp-bg-sidebar: #0f172a;
+  --cp-bg-header: #0f172a;
+
+  --cp-text-primary: #f1f5f9;
+  --cp-text-secondary: #94a3b8;
+  --cp-text-tertiary: #64748b;
+  --cp-text-inverse: #0f172a;
+
+  --cp-border-light: rgba(255, 255, 255, 0.08);
+  --cp-border-medium: rgba(255, 255, 255, 0.15);
+  --cp-border-dark: rgba(255, 255, 255, 0.25);
+
+  --cp-shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.3);
+  --cp-shadow-md: 0 6px 20px rgba(0, 0, 0, 0.4);
+  --cp-shadow-lg: 0 14px 40px rgba(0, 0, 0, 0.5);
+
+  --cp-accent-blue: #3b82f6;
+  --cp-accent-blue-light: #60a5fa;
+  --cp-accent-blue-hover: #2563eb;
+
+  --cp-success: #4ade80;
+  --cp-warning: #fbbf24;
+  --cp-danger: #f87171;
+  --cp-info: #38bdf8;
+
+  --cp-link: #60a5fa;
+  --cp-link-hover: #f87171;
+
+  --cp-panel-bg: #1e293b;
+  --cp-panel-header-bg: #334155;
+
+  --cp-drawer-bg: #1e293b;
+  --cp-drawer-border: rgba(255, 255, 255, 0.12);
+}
+
+/* =====================================================
+   DARK MODE STYLES
+   ===================================================== */
+
+/* === BODY & MAIN WRAPPER === */
+html.dark-mode body {
+  background-color: var(--cp-bg-primary) !important;
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode #main_wrapper,
+html.dark-mode .page-content,
+html.dark-mode .main-content,
+html.dark-mode .content {
+  background-color: var(--cp-bg-primary) !important;
+  color: var(--cp-text-primary) !important;
+}
+
+/* === HEADER / NAVBAR === */
+html.dark-mode header.navbar,
+html.dark-mode .header-bg-color,
+html.dark-mode .navbar,
+html.dark-mode .navbar-default,
+html.dark-mode .topbar,
+html.dark-mode .header {
+  background-color: var(--cp-bg-header) !important;
+  border-color: var(--cp-border-light) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark-mode header.navbar h4,
+html.dark-mode .navbar-header.headerContent h4 {
+  color: var(--cp-text-inverse) !important;
+}
+
+/* === SIDEBAR === */
+html.dark-mode nav#side_nav.sidebar-bg-color,
+html.dark-mode .sidebar-bg-color {
+  background-color: var(--cp-bg-sidebar) !important;
+  border-right: 1px solid var(--cp-border-light) !important;
+}
+
+html.dark-mode nav#side_nav.sidebar-bg-color li > a {
+  color: var(--cp-text-secondary) !important;
+}
+
+html.dark-mode nav#side_nav.sidebar-bg-color li > a:hover,
+html.dark-mode nav#side_nav.sidebar-bg-color li.active > a,
+html.dark-mode nav#side_nav.sidebar-bg-color li.k-state-selected > a {
+  background: linear-gradient(135deg, #334155 0%, #475569 52%, #3b82f6 100%) !important;
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode nav#side_nav.sidebar-bg-color li:hover > a .nav_title,
+html.dark-mode nav#side_nav.sidebar-bg-color li.active > a .nav_title,
+html.dark-mode nav#side_nav.sidebar-bg-color li > a:hover .nav_title {
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode nav#side_nav.sidebar-bg-color li:hover > a i,
+html.dark-mode nav#side_nav.sidebar-bg-color li.active > a i {
+  color: var(--cp-text-primary) !important;
+}
+
+/* === SIDEBAR HELP CARD === */
+html.dark-mode #side_nav .shc-card {
+  background: var(--cp-bg-card) !important;
+  border: 1px solid var(--cp-border-medium) !important;
+  box-shadow: var(--cp-shadow-sm) !important;
+}
+
+html.dark-mode #side_nav .shc-title {
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode #side_nav .shc-sub {
+  color: var(--cp-text-secondary) !important;
+}
+
+html.dark-mode #side_nav .shc-btn {
+  background: var(--cp-accent-blue) !important;
+}
+
+/* === SEARCH BAR === */
+html.dark-mode .navbar__search .input-group {
+  background: var(--cp-bg-tertiary) !important;
+  border: 1px solid var(--cp-border-medium) !important;
+  box-shadow: var(--cp-shadow-sm) !important;
+}
+
+html.dark-mode .navbar__search--input {
+  background: transparent !important;
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode .navbar__search--input::placeholder {
+  color: var(--cp-text-tertiary) !important;
+}
+
+html.dark-mode .navbar__search--btn {
+  background: var(--cp-accent-blue) !important;
+}
+
+/* === CARDS & PANELS === */
+html.dark-mode .panel,
+html.dark-mode .k-content .panel,
+html.dark-mode .k-pane .panel {
+  background: var(--cp-panel-bg) !important;
+  border: 1px solid var(--cp-border-light) !important;
+  box-shadow: var(--cp-shadow-sm) !important;
+}
+
+html.dark-mode .panel-heading {
+  background: var(--cp-panel-header-bg) !important;
+  border-bottom: 1px solid var(--cp-border-light) !important;
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode .panel-body {
+  background: var(--cp-panel-bg) !important;
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode .panel-title {
+  color: var(--cp-text-primary) !important;
+}
+
+/* === INCIDENTS CARD === */
+html.dark-mode .cp-incidents-card {
+  background: var(--cp-bg-card) !important;
+  border: 1px solid var(--cp-border-light) !important;
+  box-shadow: var(--cp-shadow-sm) !important;
+}
+
+html.dark-mode .cp-incidents-card__title {
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode .cp-incidents-card__subtitle {
+  color: var(--cp-text-secondary) !important;
+}
+
+html.dark-mode .cp-item-title {
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode .cp-item-text {
+  color: var(--cp-text-secondary) !important;
+}
+
+/* === SERVICE CATALOG CARDS === */
+html.dark-mode .catalog-area .mini-services,
+html.dark-mode #catalog-area .mini-services,
+html.dark-mode #catalog_area .mini-services {
+  background: var(--cp-bg-card) !important;
+  border: 1px solid var(--cp-border-light) !important;
+  box-shadow: var(--cp-shadow-sm) !important;
+}
+
+html.dark-mode .catalog-area .mini-services:hover,
+html.dark-mode #catalog-area .mini-services:hover {
+  border-color: var(--cp-accent-blue-light) !important;
+  box-shadow: var(--cp-shadow-md) !important;
+}
+
+html.dark-mode .catalog-area .mini-services > a,
+html.dark-mode #catalog-area .mini-services > a,
+html.dark-mode .cp-card-title {
+  color: var(--cp-text-primary) !important;
+}
+
+/* === LINKS === */
+html.dark-mode .link,
+html.dark-mode a {
+  color: var(--cp-link) !important;
+}
+
+html.dark-mode .link:hover,
+html.dark-mode a:hover,
+html.dark-mode a:focus {
+  color: var(--cp-link-hover) !important;
+}
+
+/* === FORMS === */
+html.dark-mode .form-control,
+html.dark-mode select.form-control,
+html.dark-mode textarea.form-control {
+  background: var(--cp-bg-input) !important;
+  border: 1px solid var(--cp-border-medium) !important;
+  color: var(--cp-text-primary) !important;
+  box-shadow: var(--cp-shadow-sm) !important;
+}
+
+html.dark-mode .form-control:focus {
+  border-color: var(--cp-accent-blue) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25), var(--cp-shadow-sm) !important;
+}
+
+html.dark-mode .form-control::placeholder {
+  color: var(--cp-text-tertiary) !important;
+}
+
+html.dark-mode label {
+  color: var(--cp-text-primary) !important;
+}
+
+/* === KENDO UI WIDGETS === */
+html.dark-mode .k-dropdown .k-dropdown-wrap,
+html.dark-mode .k-combobox .k-dropdown-wrap,
+html.dark-mode .k-numerictextbox .k-numeric-wrap,
+html.dark-mode .k-datepicker .k-picker-wrap,
+html.dark-mode .k-datetimepicker .k-picker-wrap,
+html.dark-mode .k-timepicker .k-picker-wrap {
+  background: var(--cp-bg-input) !important;
+  border: 1px solid var(--cp-border-medium) !important;
+  box-shadow: var(--cp-shadow-sm) !important;
+}
+
+html.dark-mode .k-dropdown .k-input,
+html.dark-mode .k-combobox .k-input,
+html.dark-mode .k-datepicker .k-input,
+html.dark-mode .k-datetimepicker .k-input {
+  color: var(--cp-text-primary) !important;
+  background: transparent !important;
+}
+
+html.dark-mode .k-dropdown .k-select,
+html.dark-mode .k-combobox .k-select,
+html.dark-mode .k-datepicker .k-select,
+html.dark-mode .k-datetimepicker .k-select {
+  border-left: 1px solid var(--cp-border-light) !important;
+}
+
+html.dark-mode .k-widget.k-autocomplete {
+  background: var(--cp-bg-input) !important;
+  border: 1px solid var(--cp-border-medium) !important;
+}
+
+/* === KENDO GRID === */
+html.dark-mode .k-grid {
+  background: var(--cp-bg-card) !important;
+  border: 1px solid var(--cp-border-light) !important;
+}
+
+html.dark-mode .k-grid-header {
+  background: var(--cp-bg-tertiary) !important;
+  border-bottom: 1px solid var(--cp-border-medium) !important;
+}
+
+html.dark-mode .k-grid-header th {
+  background: var(--cp-bg-tertiary) !important;
+  color: var(--cp-text-primary) !important;
+  border-color: var(--cp-border-light) !important;
+}
+
+html.dark-mode .k-grid-content {
+  background: var(--cp-bg-card) !important;
+}
+
+html.dark-mode .k-grid td {
+  background: var(--cp-bg-card) !important;
+  color: var(--cp-text-primary) !important;
+  border-color: var(--cp-border-light) !important;
+}
+
+html.dark-mode .k-grid tr:hover td {
+  background: var(--cp-bg-tertiary) !important;
+}
+
+html.dark-mode .k-grid tr.k-alt td {
+  background: var(--cp-bg-secondary) !important;
+}
+
+html.dark-mode .k-grid-pager {
+  background: var(--cp-bg-tertiary) !important;
+  border-top: 1px solid var(--cp-border-light) !important;
+  color: var(--cp-text-primary) !important;
+}
+
+/* === TABS === */
+html.dark-mode .nav-tabs {
+  border-bottom: 1px solid var(--cp-border-medium) !important;
+}
+
+html.dark-mode .nav-tabs > li > a {
+  color: var(--cp-text-secondary) !important;
+  background: transparent !important;
+}
+
+html.dark-mode .nav-tabs > li.active > a,
+html.dark-mode .nav-tabs > li > a:hover {
+  background: var(--cp-bg-card) !important;
+  color: var(--cp-text-primary) !important;
+  border-color: var(--cp-border-medium) !important;
+  border-bottom-color: var(--cp-bg-card) !important;
+}
+
+html.dark-mode .tab-content {
+  background: var(--cp-bg-card) !important;
+}
+
+html.dark-mode .tab-pane {
+  color: var(--cp-text-primary) !important;
+}
+
+/* === BUTTONS === */
+html.dark-mode .btn-default {
+  background: var(--cp-bg-tertiary) !important;
+  border: 1px solid var(--cp-border-medium) !important;
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode .btn-default:hover {
+  background: var(--cp-bg-secondary) !important;
+}
+
+html.dark-mode .btn-primary {
+  background: var(--cp-accent-blue) !important;
+  border-color: var(--cp-accent-blue) !important;
+  color: #ffffff !important;
+}
+
+html.dark-mode .btn-primary:hover {
+  background: var(--cp-accent-blue-hover) !important;
+}
+
+html.dark-mode .cp-btn--send {
+  background: var(--cp-accent-blue) !important;
+}
+
+html.dark-mode .cp-btn--cancel {
+  background: var(--cp-bg-tertiary) !important;
+  border-color: var(--cp-border-medium) !important;
+  color: var(--cp-text-primary) !important;
+}
+
+/* === DRAWER / TASKBAR === */
+html.dark-mode .drawer {
+  background-color: transparent !important;
+}
+
+html.dark-mode .drawertaskbar-commands {
+  background: var(--cp-drawer-bg) !important;
+  border: 1px solid var(--cp-drawer-border) !important;
+  box-shadow: var(--cp-shadow-lg) !important;
+}
+
+html.dark-mode .drawertaskbar-commands .btn,
+html.dark-mode .drawertaskbar-commands .btn * {
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode .drawertaskbar-newbutton {
+  background: var(--cp-bg-card) !important;
+  border: 1px solid var(--cp-accent-blue) !important;
+  color: var(--cp-accent-blue) !important;
+  box-shadow: var(--cp-shadow-md) !important;
+}
+
+html.dark-mode .drawer .drawertaskbar-commands .btn.cp-drawer-next {
+  background: var(--cp-accent-blue) !important;
+}
+
+html.dark-mode .drawer .drawertaskbar-commands .btn.cp-drawer-cancel {
+  background: rgba(248, 113, 113, 0.15) !important;
+  color: var(--cp-danger) !important;
+}
+
+html.dark-mode .drawer .drawertaskbar-commands .btn.cp-drawer-cancel * {
+  color: var(--cp-danger) !important;
+}
+
+html.dark-mode .drawertaskbar-commands .btn.cp-drawer-send:not([disabled]):not(.disabled) {
+  background: rgba(74, 222, 128, 0.15) !important;
+  color: var(--cp-success) !important;
+}
+
+/* === ACTION LOG / CHAT === */
+html.dark-mode ul.chat > li.left.clearfix {
+  border-bottom: 1px solid var(--cp-border-light) !important;
+}
+
+html.dark-mode ul.chat > li.left.clearfix .chat-body > p {
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode ul.chat > li.left.clearfix .chat-body > div {
+  color: var(--cp-text-secondary) !important;
+}
+
+html.dark-mode ul.chat > li.left.clearfix .chat-body > div > small {
+  color: var(--cp-text-tertiary) !important;
+}
+
+/* === KENDO EDITOR === */
+html.dark-mode .k-editor {
+  background: var(--cp-bg-input) !important;
+  border: 1px solid var(--cp-border-medium) !important;
+}
+
+html.dark-mode .k-editor .k-editable-area {
+  background: var(--cp-bg-input) !important;
+}
+
+html.dark-mode .k-editor iframe.k-content {
+  background: var(--cp-bg-input) !important;
+}
+
+/* === COMMENT TOGGLE === */
+html.dark-mode .cp-comment-toggle {
+  background: linear-gradient(var(--cp-bg-tertiary), var(--cp-bg-secondary)) !important;
+  border: 1px solid var(--cp-border-medium) !important;
+}
+
+html.dark-mode .cp-comment-toggle i {
+  color: var(--cp-text-secondary) !important;
+}
+
+html.dark-mode .cp-comment-toggle:hover {
+  background: linear-gradient(var(--cp-bg-secondary), var(--cp-bg-tertiary)) !important;
+}
+
+html.dark-mode .cp-comment-toggle:hover i {
+  color: var(--cp-accent-blue-light) !important;
+}
+
+/* === DROPDOWN MENU (Profile etc.) === */
+html.dark-mode .dropdown-menu {
+  background: var(--cp-bg-secondary) !important;
+  border: 1px solid var(--cp-border-medium) !important;
+  box-shadow: var(--cp-shadow-lg) !important;
+}
+
+html.dark-mode .dropdown-menu > li > a {
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode .dropdown-menu > li > a:hover {
+  background: var(--cp-bg-tertiary) !important;
+}
+
+html.dark-mode .dropdown-menu .divider {
+  background: var(--cp-border-light) !important;
+}
+
+html.dark-mode header.navbar .navbar-right .dropdown-menu {
+  background: var(--cp-bg-secondary) !important;
+}
+
+html.dark-mode header.navbar .navbar-right .dropdown-menu > li > a {
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode header.navbar .navbar-right .dropdown-menu > li > a:hover {
+  background: var(--cp-bg-tertiary) !important;
+}
+
+/* === MODAL === */
+html.dark-mode .modal-content {
+  background: var(--cp-bg-card) !important;
+  border: 1px solid var(--cp-border-medium) !important;
+  box-shadow: var(--cp-shadow-lg) !important;
+}
+
+html.dark-mode .modal-header {
+  background: var(--cp-bg-tertiary) !important;
+  border-bottom: 1px solid var(--cp-border-light) !important;
+}
+
+html.dark-mode .modal-title {
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode .modal-body {
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode .modal-footer {
+  background: var(--cp-bg-tertiary) !important;
+  border-top: 1px solid var(--cp-border-light) !important;
+}
+
+/* === ALERTS === */
+html.dark-mode .alert {
+  border: 1px solid var(--cp-border-medium) !important;
+}
+
+html.dark-mode .alert-info {
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: var(--cp-info) !important;
+}
+
+html.dark-mode .alert-success {
+  background: rgba(74, 222, 128, 0.15) !important;
+  color: var(--cp-success) !important;
+}
+
+html.dark-mode .alert-warning {
+  background: rgba(251, 191, 36, 0.15) !important;
+  color: var(--cp-warning) !important;
+}
+
+html.dark-mode .alert-danger {
+  background: rgba(248, 113, 113, 0.15) !important;
+  color: var(--cp-danger) !important;
+}
+
+/* === PAGE TITLE === */
+html.dark-mode .page_bar .page_title,
+html.dark-mode .page_bar .page-title,
+html.dark-mode .page_bar h1,
+html.dark-mode h1,
+html.dark-mode h2,
+html.dark-mode h3,
+html.dark-mode h4,
+html.dark-mode h5,
+html.dark-mode h6 {
+  color: var(--cp-text-primary) !important;
+}
+
+/* === TABLES === */
+html.dark-mode table {
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode table thead th {
+  background: var(--cp-bg-tertiary) !important;
+  color: var(--cp-text-primary) !important;
+  border-color: var(--cp-border-light) !important;
+}
+
+html.dark-mode table tbody td {
+  background: var(--cp-bg-card) !important;
+  color: var(--cp-text-primary) !important;
+  border-color: var(--cp-border-light) !important;
+}
+
+html.dark-mode table tbody tr:hover td {
+  background: var(--cp-bg-tertiary) !important;
+}
+
+/* === WELL === */
+html.dark-mode .well {
+  background: var(--cp-bg-secondary) !important;
+  border: 1px solid var(--cp-border-light) !important;
+}
+
+/* === BREADCRUMB === */
+html.dark-mode .breadcrumb {
+  background: var(--cp-bg-secondary) !important;
+}
+
+html.dark-mode .breadcrumb > li,
+html.dark-mode .breadcrumb > li > a {
+  color: var(--cp-text-secondary) !important;
+}
+
+html.dark-mode .breadcrumb > .active {
+  color: var(--cp-text-primary) !important;
+}
+
+/* === STATUS COLORS (angepasst fuer Dark Mode) === */
+html.dark-mode .statusInfo,
+html.dark-mode .statusInProgress,
+html.dark-mode .statusPending,
+html.dark-mode .statusWartend {
+  background-color: rgba(56, 189, 248, 0.2) !important;
+  color: var(--cp-info) !important;
+}
+
+html.dark-mode .statusRejected,
+html.dark-mode .statusFailed,
+html.dark-mode .statusFehler {
+  background-color: rgba(248, 113, 113, 0.2) !important;
+  color: var(--cp-danger) !important;
+}
+
+html.dark-mode .statusAwatingExternal,
+html.dark-mode .statusUpdatedByUser,
+html.dark-mode .statusOnHold {
+  background-color: rgba(251, 191, 36, 0.2) !important;
+  color: var(--cp-warning) !important;
+}
+
+html.dark-mode .statusActive,
+html.dark-mode .statusSubmitted {
+  background-color: rgba(74, 222, 128, 0.2) !important;
+  color: var(--cp-success) !important;
+}
+
+/* === SCROLLBAR (WebKit) === */
+html.dark-mode ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+html.dark-mode ::-webkit-scrollbar-track {
+  background: var(--cp-bg-secondary);
+}
+
+html.dark-mode ::-webkit-scrollbar-thumb {
+  background: var(--cp-bg-tertiary);
+  border-radius: 5px;
+}
+
+html.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* === SUBPANEL (Sidebar Flyout) === */
+html.dark-mode #side_nav .sub_panel {
+  background: var(--cp-bg-secondary) !important;
+  border: 1px solid var(--cp-border-medium) !important;
+  box-shadow: var(--cp-shadow-lg) !important;
+}
+
+html.dark-mode #side_nav .sub_panel li > a {
+  color: var(--cp-text-secondary) !important;
+}
+
+html.dark-mode #side_nav .sub_panel li > a:hover {
+  background: var(--cp-bg-tertiary) !important;
+  color: var(--cp-text-primary) !important;
+}
+
+/* === ACTIVITIES === */
+html.dark-mode .activity-list-container {
+  background: var(--cp-bg-card) !important;
+}
+
+html.dark-mode .activity-item-header {
+  background: var(--cp-bg-tertiary) !important;
+  border: 1px solid var(--cp-border-light) !important;
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode .activity-item-body {
+  background: var(--cp-bg-card) !important;
+  color: var(--cp-text-primary) !important;
+}
+
+/* === MISC === */
+html.dark-mode hr {
+  border-color: var(--cp-border-light) !important;
+}
+
+html.dark-mode code {
+  background: var(--cp-bg-tertiary) !important;
+  color: var(--cp-danger) !important;
+}
+
+html.dark-mode pre {
+  background: var(--cp-bg-secondary) !important;
+  border: 1px solid var(--cp-border-light) !important;
+  color: var(--cp-text-primary) !important;
+}
+
+html.dark-mode .text-muted {
+  color: var(--cp-text-tertiary) !important;
+}
+
+html.dark-mode .help-block {
+  color: var(--cp-text-secondary) !important;
+}
+
+/* === RELATED ITEMS GRID === */
+html.dark-mode .relateditems-grid {
+  background: var(--cp-bg-card) !important;
+}
+
+html.dark-mode .relateditems-grid .two-action-input-group__primary-action.k-button {
+  background: var(--cp-bg-tertiary) !important;
+  border: 1px solid var(--cp-border-medium) !important;
+  color: var(--cp-text-primary) !important;
+}
+
+/* === TOOLTIP === */
+html.dark-mode .tooltip-inner {
+  background: var(--cp-bg-tertiary) !important;
+  color: var(--cp-text-primary) !important;
+}
+
+/* === POPOVER === */
+html.dark-mode .popover {
+  background: var(--cp-bg-card) !important;
+  border: 1px solid var(--cp-border-medium) !important;
+}
+
+html.dark-mode .popover-title {
+  background: var(--cp-bg-tertiary) !important;
+  color: var(--cp-text-primary) !important;
+  border-bottom: 1px solid var(--cp-border-light) !important;
+}
+
+html.dark-mode .popover-content {
+  color: var(--cp-text-primary) !important;
+}
+
+/* === ICON COLORS === */
+html.dark-mode .fa-check {
+  color: var(--cp-success) !important;
+}
+
+html.dark-mode .fa-times {
+  color: var(--cp-danger) !important;
+}
+
+html.dark-mode .fa-pencil {
+  color: var(--cp-warning) !important;
+}
+
+html.dark-mode .fa-arrow-left,
+html.dark-mode .fa-arrow-right,
+html.dark-mode .fa-star-o,
+html.dark-mode .fa-tasks {
+  color: var(--cp-text-secondary) !important;
+}
+
+/* =====================================================
+   DARK MODE TOGGLE BUTTON (optional)
+   Fuege dieses Element per JS hinzu fuer einen Toggle-Button
+   ===================================================== */
+
+.dark-mode-toggle {
+  position: fixed;
+  bottom: 100px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--cp-accent-blue);
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--cp-shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  z-index: 99999;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dark-mode-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: var(--cp-shadow-lg);
+}
+
+/* =====================================================
+   JS SNIPPET ZUM EINFUEGEN IN CONSOLE:
+
+   // Toggle Button erstellen
+   (function() {
+     const btn = document.createElement('button');
+     btn.className = 'dark-mode-toggle';
+     btn.innerHTML = '🌙';
+     btn.onclick = function() {
+       document.documentElement.classList.toggle('dark-mode');
+       btn.innerHTML = document.documentElement.classList.contains('dark-mode') ? '☀️' : '🌙';
+     };
+     document.body.appendChild(btn);
+   })();
+
+   ===================================================== */
